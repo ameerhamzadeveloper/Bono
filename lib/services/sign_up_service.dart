@@ -98,6 +98,7 @@ class SignUpService{
         'buildingName':map['buildingName'],
         'area':map['area'],
         'street':map['street'],
+        'searchPhone':map['searchPhone'],
       };
       await ref.set(userData);
     }
@@ -110,6 +111,19 @@ class SignUpService{
       data = value.data()!;
     });
     return data!;
+  }
+
+  addContacts(String ref,String title,Map<String,dynamic> map){
+    firestore.collection('users').doc(ref).collection(title).add({
+      'name': map['name'],
+      'image': map['image'],
+      'phone': map['phone'],
+    });
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getMyPhotoy(String phone)async{
+    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').where('phone',isEqualTo: phone).get();
+    return data;
   }
 
 }

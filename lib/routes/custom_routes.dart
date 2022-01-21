@@ -1,4 +1,7 @@
 import 'package:bono_gifts/routes/routes_names.dart';
+import 'package:bono_gifts/views/bottom_nav_bar.dart';
+import 'package:bono_gifts/views/feeds/add_post.dart';
+import 'package:bono_gifts/views/loading_page.dart';
 import 'package:bono_gifts/views/not_found_page.dart';
 import 'package:bono_gifts/views/profile/profile.dart';
 import 'package:bono_gifts/views/signup/create_profile.dart';
@@ -24,6 +27,12 @@ class CustomRoutes {
         return MaterialPageRoute(builder: (_) => const CreateProfile());
       case profilePage:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
+      case bottomNav:
+        return MaterialPageRoute(builder: (_) => const BottomNavBar());
+      case laoding:
+        return MaterialPageRoute(builder: (_) =>  LoadingPage());
+      case addPOst:
+        return MaterialPageRoute(builder: (_) =>  AddPost());
     }
     return MaterialPageRoute(builder: (_) => NotFoundPage());
   }

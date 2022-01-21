@@ -1,3 +1,4 @@
+import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/routes/custom_routes.dart';
 import 'package:bono_gifts/routes/routes_names.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<SignUpProvider>(
           create: (context) => SignUpProvider(),
          ),
+        ChangeNotifierProvider<FeedsProvider>(
+          create: (context) => FeedsProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -28,7 +32,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         onGenerateRoute: CustomRoutes.allRoutes,
-        initialRoute: welcomePage,
+        initialRoute: laoding,
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpProvider extends ChangeNotifier {
 
@@ -37,6 +38,10 @@ class SignUpProvider extends ChangeNotifier {
   String otpErro = '';
   bool isWaitingCon = false;
   Uint8List? bytesImage;
+  String? phone;
+  DateTime? timeStamp;
+
+  List<String> myPosts = [];
 
 
   getImage()async{
@@ -84,11 +89,11 @@ class SignUpProvider extends ChangeNotifier {
       latitude = pos.latitude;
       longitude = pos.longitude;
       addMarker();
-      animateCamera(_controller);
       List<Placemark> newPlace = await placemarkFromCoordinates(pos.latitude, pos.longitude);
       setStreet(newPlace.last.street!);
       setArea(newPlace.last.name!);
       country = newPlace.last.country;
+      animateCamera(_controller);
       notifyListeners();
     });
   }
@@ -110,9 +115,8 @@ class SignUpProvider extends ChangeNotifier {
   }
 
   signUpUser(BuildContext context){
-    dobFormat = null;
     Map<String,dynamic> userMap = {
-      'phone':'$dailCode$phoneNumber',
+      'phone':'$dailCode${phoneNumber.text}',
       'name': name,
       'dob': dob,
       'dobFormat':dobFormat,
@@ -123,8 +127,10 @@ class SignUpProvider extends ChangeNotifier {
       'buildingName':buildingName.text,
       'area':area.text,
       'street':street.text,
+      'searchPhone':phoneNumber.text,
     };
     service.saveToFirebase(userMap).then((value){
+      saveToShared();
       makeWatingDone();
       if(value)
        { Navigator.pushReplacementNamed(context, profilePage);}
@@ -139,7 +145,7 @@ class SignUpProvider extends ChangeNotifier {
       phoneNumber = TextEditingController(text:data['phone']);
       name = data['name'];
       dob = data['dob'];
-      dobFormat = DateTime.parse(data['dobFormat'].toDate().toString());
+      dobFormat = data['dobFormat'].toDate();
       email = data['email'];
       userImage = data['profile_url'];
       country = data['country'];
@@ -147,10 +153,35 @@ class SignUpProvider extends ChangeNotifier {
       buildingName = TextEditingController(text:data['buildingName']);
       area = TextEditingController(text:data['area']);
       street = TextEditingController(text:data['street']);
-      print(name);
       getDateDiff();
       notifyListeners();
     });
+    getMyPhoto();
+  }
+  saveToShared()async{
+    SharedPreferences pre = await SharedPreferences.getInstance();
+    pre.setString('phone', '$dailCode${phoneNumber.text}');
+  }
+   getSharedData()async{
+    SharedPreferences pre = await SharedPreferences.getInstance();
+    var ph = pre.getString('phone');
+    phoneNumber = TextEditingController(text: ph);
+    phone = ph;
+    print(phone);
+    if(phone != null || phone != ''){
+      getUser();
+    }
+  }
+
+  setShared()async{
+    String ph = '+923033374110';
+    SharedPreferences pre = await SharedPreferences.getInstance();
+    pre.setString('phone', ph);
+  }
+
+  logout()async{
+    SharedPreferences pre = await SharedPreferences.getInstance();
+    pre.clear();
   }
 
   getDateDiff(){
@@ -187,5 +218,19 @@ class SignUpProvider extends ChangeNotifier {
     });
   }
 
+  setContacts(String title,Map<String,dynamic> map){
+    service.addContacts(phone!, title, map);
+  }
+
+  getMyPhoto(){
+    print("====================");
+    service.getMyPhotoy(phone!).then((value){
+      for(var i in value.docs){
+        print("doc leng ${value.docs.length}");
+        myPosts.add(i['image url']);
+      }
+      notifyListeners();
+    });
+  }
 
 }

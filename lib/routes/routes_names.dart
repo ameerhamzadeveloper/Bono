@@ -5,3 +5,6 @@ const String dobPage = '/dob';
 const String deliveryAdd = '/deliverAdd';
 const String createProfile = '/createProfile';
 const String profilePage = '/profilePage';
+const String bottomNav = '/bottomNav';
+const String laoding = '/loading';
+const String addPOst = '/addPost';
