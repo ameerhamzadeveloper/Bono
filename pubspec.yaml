@@ -47,6 +47,8 @@ dependencies:
 
 #  camera
   image_picker: ^0.8.4+4
+  camera: ^0.9.3
+  video_player: ^2.2.2
 
 #  location
   geolocator: ^8.0.3

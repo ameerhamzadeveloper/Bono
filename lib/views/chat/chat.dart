@@ -1,10 +1,14 @@
 import 'package:bono_gifts/config/constants.dart';
-import 'package:bono_gifts/helper.dart';
+import 'package:bono_gifts/helper/country_code_without_plus.dart';
+import 'package:bono_gifts/helper/helper.dart';
+import 'package:bono_gifts/provider/sign_up_provider.dart';
+import 'package:bono_gifts/views/chat/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:provider/provider.dart';
 class Chat extends StatefulWidget {
   @override
   _ChatState createState() => _ChatState();
@@ -16,9 +20,11 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
   getFirebaseContact(){
     FirebaseFirestore.instance.collection('users').get().then((value){
       for(var d in value.docs){
+        print("calling");
         phones.add(d['searchPhone']);
+        print(d['searchPhone']);
       }
-      print(phones.length);
+      getContacts();
     });
   }
 
@@ -40,7 +46,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
           withProperties: true, withPhoto: true);
       for(var i = 0;i< contacts.length;i++){
         setState(() {
-          contactList.add(contacts[i].phones[0].number);
+          contactList.add(contacts[i].phones[0].number.replaceAll(' ', ''));
           nameCont.add(ContModel(name: "${contacts[i].name.first} ${contacts[i].name.last}", phone: contacts[i].phones[0].number));
           // print(contactList);
         });
@@ -65,28 +71,49 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
   // }
 
   compareContactListDailCode(){
-    for(var j = 0; j < DailCode().dailCode.length;j++){
-      for(var i = 0; i < contactList.length;i++){
-        if(contactList[i].contains(DailCode().dailCode[j]['dial_code']!)){
-          var list = contactList[i].replaceAll(' ', '');
-          var li = list.startsWith('0',0) ? list.substring(1, list.length -1): list;
-          // var nL = ;
-          // print("contact ${list.replaceAll(DailCode().dailCode[j]['dial_code']!, '')}");
-          newContList.add(li.replaceAll(DailCode().dailCode[j]['dial_code']!, ''));
-        }
-      }
-    }
+    // for(var j = 0; j < DailCode().dailCode.length;j++){
+    //   for(var i = 0; i < contactList.length;i++){
+    //     // if(contactList[i].contains(DailCode().dailCode[j]['dial_code']!) || (contactList[i].substring(0,2) == '00')||(contactList[i].startsWith('0',0))){
+    //       var list = contactList[i].replaceAll(' ', '');
+    //
+    //       var lw = list.substring(0,2) == '00'? list.substring(2, list.length).replaceAll(DailCodeWithoutPlus().dailCode[j]['dial_code']!, '') : list;
+    //       var li = lw.startsWith('0',0) ? lw.substring(1, lw.length -1): lw;
+    //       // var nL = ;
+    //       // print("contact ${list.replaceAll(DailCode().dailCode[j]['dial_code']!, '')}");
+    //       newContList.add(li.replaceAll(DailCode().dailCode[j]['dial_code']!, ''));
+        // }
+        // var list = contactList[i].replaceAll(' ', '');
+        // var doublezero = list[i].substring(0,2) == '00' ? list.substring(2, list.length).replaceAll(DailCodeWithoutPlus().dailCode[j]['dial_code']!, ''):list;
+        // var singZero = doublezero[i].startsWith('0',0) ? doublezero.substring(1, list.length) : doublezero;
+        // var countCode = singZero.contains(DailCode().dailCode[j]['dial_code']!) ? singZero.replaceAll(DailCode().dailCode[j]['dial_code']!, ''):singZero;
+        // newContList.add(countCode);
+        // var list = contactList[i].replaceAll(' ', '');
+        // if(contactList[i].substring(0,2) == '00'){
+        //   var fL = contactList[i].substring(2, contactList[i].length);
+        //   var fl = contactList[i].substring(2, contactList[i].length).replaceFirst(DailCodeWithoutPlus().dailCode[j]['dial_code']!, '',0);
+        //   print("wihtout country code ${fl} $j and $i");
+        //   newContList.add(fl);
+        // }
+        // else if(contactList[i].startsWith('0',0)){
+        //   newContList.add(contactList[i].substring(1, contactList[i].length));
+        // }else if(contactList[i].contains(DailCode().dailCode[j]['dial_code']!)){
+        //   // var nL = ;
+        //   print("contact ${contactList[i].replaceAll(DailCode().dailCode[j]['dial_code']!, '')}");
+        //   newContList.add(contactList[i].replaceAll(DailCode().dailCode[j]['dial_code']!, ''));
+        // }
+    //   }
+    // }
   }
 
   matchTheList(){
     print(phones);
-    print(newContList);
+    print("new Cont ${newContList.toSet().toList()}");
     for(var i = 0;i< phones.length;i++){
-      for(var j =0;j<newContList.length;j++){
-        if(newContList[j].contains(phones[i])){
-          print("iorere ${newContList[j]}");
+      for(var j =0;j<contactList.toSet().toList().length;j++){
+        if(contactList.toSet().toList()[j].contains(phones[i])){
+          print("iorere ${contactList[j]}");
           setState(() {
-            newList.add(newContList[j]);
+            newList.add(contactList[j]);
           });
         }
       }
@@ -101,7 +128,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
     print("called");
     print(newList.length);
     for(var i = 0; i<newList.length;i++){
-      FirebaseFirestore.instance.collection('users').where('searchPhone', isEqualTo: newList[i]).get().then((value){
+      FirebaseFirestore.instance.collection('users').where('phone', isLessThanOrEqualTo: newList[i]).get().then((value){
         print(value.docs[i].id);
         setState(() {
           netWorkLsit.add(NewtWorkModel(name: value.docs[i]['name'], phone: value.docs[i]['phone'], photo: value.docs[i]['profile_url'],isSelect: false));
@@ -154,16 +181,20 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
       networkCat[i].isSel = true;
     });
   }
+  List matchList = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    getContacts();
     getFirebaseContact();
+
   }
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
+    final pro = Provider.of<SignUpProvider>(context);
+    final Stream<QuerySnapshot> documentStream = firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').snapshots();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -221,7 +252,37 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                 ),
               ),
               _tabController.index == 0 ? Container(
-                child: Text("Chat Page"),
+                child:  Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: StreamBuilder(
+        stream: documentStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
+          if(snapshot.data == null){
+            return Center(child: Text("No Messages"),);
+          }else{
+            return ListView(
+              shrinkWrap: true,
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(data['profileImage']),
+                    ),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: data['recieverName'],profileImage: data['profileImage'],recieverPhone: data['recieverID'])));
+                    },
+                    title: Text(data['recieverName']),
+                    subtitle: Text(data['lastMessage']),
+                    trailing: Text(data['date']),
+                  ),
+                );
+              }).toList(),
+            );
+          }
+        },
+      )
+    ),
               ): _tabController.index == 1 ?  Column(
                 children: [
                   SingleChildScrollView(
@@ -481,57 +542,57 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
               SingleChildScrollView(
                 child: Column(
                   children: [
-                    alPhabat("A"),
+                    matchList.contains('a') ? alPhabat('A') :Container(),
                     getConList('a'),
-                    alPhabat("B"),
+                    matchList.contains('b') ? alPhabat('B') :Container(),
                     getConList('b'),
-                    alPhabat("C"),
+                    matchList.contains('c') ? alPhabat('C') :Container(),
                     getConList('c'),
-                    alPhabat("D"),
+                    matchList.contains('d') ? alPhabat('D') :Container(),
                     getConList('d'),
-                    alPhabat("E"),
+                    matchList.contains('e') ? alPhabat('E') :Container(),
                     getConList('e'),
-                    alPhabat("F"),
+                    matchList.contains('f') ? alPhabat('F') :Container(),
                     getConList('f'),
-                    alPhabat("G"),
+                    matchList.contains('g') ? alPhabat('G') :Container(),
                     getConList('g'),
-                    alPhabat("H"),
+                    matchList.contains('h') ? alPhabat('H') :Container(),
                     getConList('h'),
-                    alPhabat("I"),
+                    matchList.contains('i') ? alPhabat('I') :Container(),
                     getConList('i'),
-                    alPhabat("J"),
+                    matchList.contains('j') ? alPhabat('J') :Container(),
                     getConList('j'),
-                    alPhabat("K"),
+                    matchList.contains('k') ? alPhabat('K') :Container(),
                     getConList('k'),
-                    alPhabat("L"),
+                    matchList.contains('l') ? alPhabat('L') :Container(),
                     getConList('l'),
-                    alPhabat("M"),
+                    matchList.contains('m') ? alPhabat('M') :Container(),
                     getConList('m'),
-                    alPhabat("N"),
+                    matchList.contains('n') ? alPhabat('N') :Container(),
                     getConList('n'),
-                    alPhabat("O"),
+                    matchList.contains('o') ? alPhabat('O') :Container(),
                     getConList('o'),
-                    alPhabat("P"),
+                    matchList.contains('p') ? alPhabat('P') :Container(),
                     getConList('p'),
-                    alPhabat("Q"),
+                    matchList.contains('q') ? alPhabat('Q') :Container(),
                     getConList('q'),
-                    alPhabat("R"),
+                    matchList.contains('r') ? alPhabat('R') :Container(),
                     getConList('r'),
-                    alPhabat("S"),
+                    matchList.contains('s') ? alPhabat('S') :Container(),
                     getConList('s'),
-                    alPhabat("T"),
+                    matchList.contains('t') ? alPhabat('T') :Container(),
                     getConList('t'),
-                    alPhabat("U"),
+                    matchList.contains('u') ? alPhabat('U') :Container(),
                     getConList('u'),
-                    alPhabat("V"),
+                    matchList.contains('v') ? alPhabat('V') :Container(),
                     getConList('v'),
-                    alPhabat("W"),
+                    matchList.contains('w') ? alPhabat('W') :Container(),
                     getConList('w'),
-                    alPhabat("X"),
+                    matchList.contains('x') ? alPhabat('X') :Container(),
                     getConList('x'),
-                    alPhabat("Y"),
+                    matchList.contains('y') ? alPhabat('Y') :Container(),
                     getConList('y'),
-                    alPhabat("Z"),
+                    matchList.contains('z') ? alPhabat('Z') :Container(),
                     getConList('z'),
 
                   ],
@@ -540,7 +601,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
             ],
           ),
         ),
-      ),
+    )
     );
   }
   Widget getConList(String alph){
@@ -550,6 +611,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
       itemCount: nameCont.length,
       itemBuilder: (contxt,i){
         print(nameCont[i]);
+        matchList.add(nameCont[i].name.substring(0,1).toLowerCase());
         if(nameCont[i].name.startsWith(alph.toLowerCase(),0) || nameCont[i].name.startsWith(alph.toUpperCase(),0)){
           return Padding(
             padding: const EdgeInsets.all(8.0),

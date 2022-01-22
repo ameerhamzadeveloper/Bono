@@ -179,9 +179,10 @@ class SignUpProvider extends ChangeNotifier {
     pre.setString('phone', ph);
   }
 
-  logout()async{
+  logout(BuildContext context)async{
     SharedPreferences pre = await SharedPreferences.getInstance();
     pre.clear();
+    Navigator.pushNamedAndRemoveUntil(context, laoding, (route) => false);
   }
 
   getDateDiff(){

@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     Chat(),
     BuyPage(),
     Feeds(),
-    CameraPage(),
+    CameraScreen(),
     const ProfilePage()
   ];
   @override

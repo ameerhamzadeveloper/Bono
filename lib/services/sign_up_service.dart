@@ -76,6 +76,7 @@ class SignUpService{
         'buildingName':map['buildingName'],
         'area':map['area'],
         'street':map['street'],
+        'searchPhone':map['searchPhone'],
       };
 
       await ref.set(userData);

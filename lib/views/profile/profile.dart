@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       MaterialButton(
                         color: Colors.grey[300],
-                        onPressed: (){},
+                        onPressed: ()=>pro.logout(context),
                         child: const Text("Sign out"),
                       ),
                       // const SizedBox(width: 20,),

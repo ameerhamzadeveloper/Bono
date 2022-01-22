@@ -1,6 +1,7 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/routes/routes_names.dart';
+import 'package:bono_gifts/views/chat/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -248,7 +249,9 @@ class _FeedsState extends State<Feeds> {
                                         );
                                       });
                                     }, icon:  Icon(Icons.comment)),
-                                    IconButton(onPressed: (){}, icon:  Icon(Icons.chat_bubble)),
+                                    IconButton(onPressed: (){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: pro.feeds[i].profileName,profileImage: pro.feeds[i].profileImage,recieverPhone:pro.feeds[i].phone)));
+                                    }, icon:  Icon(Icons.chat_bubble)),
                                     IconButton(onPressed: (){}, icon:  Icon(Icons.bathtub_sharp)),
 
                                   ],
