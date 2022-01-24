@@ -87,7 +87,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                   ),
                 ),
                 const SizedBox(height: 10,),
-                Container(
+                SizedBox(
                   height: getHeight(context) / 3,
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(target: latLng, zoom: 40.0),
@@ -103,7 +103,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                 ),
                 const SizedBox(height: 10,),
                 const Text("Room / Villa no"),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Container(
                   decoration: BoxDecoration(
                       border: Border.all(),
@@ -125,7 +125,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                 ),
                 const SizedBox(height: 10,),
                 const Text("Building Name"),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Container(
                   decoration: BoxDecoration(
                       border: Border.all(),
@@ -147,7 +147,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                 ),
                 const SizedBox(height: 10,),
                 const Text("Area"),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Container(
                   decoration: BoxDecoration(
                       border: Border.all(),
@@ -169,7 +169,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                 ),
                 const SizedBox(height: 10,),
                 const Text("Street"),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Container(
                   decoration: BoxDecoration(
                       border: Border.all(),
@@ -189,7 +189,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

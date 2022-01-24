@@ -102,7 +102,7 @@ class _FeedsState extends State<Feeds> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Row(
@@ -121,127 +121,147 @@ class _FeedsState extends State<Feeds> {
                               child: Container(
                                 color:Colors.black.withOpacity(0.2),
                                 child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    IconButton(onPressed: (){}, icon: const Icon(Icons.share)),
-                                    IconButton(onPressed: (){
-                                      showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          context: context, builder: (contxt){
-                                        return SafeArea(
-                                          child: Container(
-                                            color: Colors.transparent,
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(
+                                        onTap: (){},
+                                        child: Image.asset(sharedIcon,height: 30,width: 30,),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(onTap: (){
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            context: context, builder: (contxt){
+                                          return SafeArea(
                                             child: Container(
-                                              decoration:  const BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:  BorderRadius.only(
-                                                      topLeft:  Radius.circular(10.0),
-                                                      topRight:  Radius.circular(10.0))),
+                                              color: Colors.transparent,
+                                              child: Container(
+                                                decoration:  const BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:  BorderRadius.only(
+                                                        topLeft:  Radius.circular(10.0),
+                                                        topRight:  Radius.circular(10.0))),
 
-                                              height: MediaQuery.of(context).size.height,
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      const SizedBox(height: 20,),
-                                                      const Divider(),
-                                                      StreamBuilder(
-                                                        stream: pro.colRef.doc(pro.feeds[i].docid).collection('comments').snapshots(),
-                                                        builder: (context,AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot){
-                                                          if(snapshot.connectionState == ConnectionState.waiting){
-                                                            return Center(child: CircularProgressIndicator(),);
-                                                          }else if(snapshot.hasData){
-                                                            List<DocumentSnapshot> docs = snapshot.data!.docs;
-                                                            return ListView.builder(
-                                                              physics: const NeverScrollableScrollPhysics(),
-                                                              itemCount: docs.length,
-                                                              shrinkWrap: true,
-                                                              itemBuilder: (context,i){
-                                                                return Padding(
-                                                                  padding: const EdgeInsets.all(8.0),
-                                                                  child: Container(
+                                                height: MediaQuery.of(context).size.height,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        const SizedBox(height: 20,),
+                                                        const Divider(),
+                                                        StreamBuilder(
+                                                          stream: pro.colRef.doc(pro.feeds[i].docid).collection('comments').snapshots(),
+                                                          builder: (context,AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot){
+                                                            if(snapshot.connectionState == ConnectionState.waiting){
+                                                              return Center(child: CircularProgressIndicator(),);
+                                                            }else if(snapshot.hasData){
+                                                              List<DocumentSnapshot> docs = snapshot.data!.docs;
+                                                              return ListView.builder(
+                                                                physics: const NeverScrollableScrollPhysics(),
+                                                                itemCount: docs.length,
+                                                                shrinkWrap: true,
+                                                                itemBuilder: (context,i){
+                                                                  return Padding(
                                                                     padding: const EdgeInsets.all(8.0),
-                                                                    decoration: BoxDecoration(
-                                                                        color: Colors.grey.withOpacity(0.4),
-                                                                        borderRadius: const BorderRadius.only(
-                                                                          topLeft: Radius.circular(20),
-                                                                          topRight: Radius.circular(20),
-                                                                          bottomRight: Radius.circular(20),
-                                                                        )
+                                                                    child: Container(
+                                                                      padding: const EdgeInsets.all(8.0),
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors.grey.withOpacity(0.4),
+                                                                          borderRadius: const BorderRadius.only(
+                                                                            topLeft: Radius.circular(20),
+                                                                            topRight: Radius.circular(20),
+                                                                            bottomRight: Radius.circular(20),
+                                                                          )
+                                                                      ),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Column(
+                                                                            children: [
+                                                                              CircleAvatar(
+                                                                                backgroundImage: NetworkImage(docs[i]['image']),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                          const SizedBox(width: 10,),
+                                                                          Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(docs[i]['name']),
+                                                                              Text(docs[i]['text']),
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    child: Row(
-                                                                      children: [
-                                                                        Column(
-                                                                          children: [
-                                                                            CircleAvatar(
-                                                                              backgroundImage: NetworkImage(docs[i]['image']),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                        const SizedBox(width: 10,),
-                                                                        Column(
-                                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Text(docs[i]['name']),
-                                                                            Text(docs[i]['text']),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            );
-                                                          }else{
-                                                            return const Center(child: Text("No Commnets"),);
-                                                          }
-                                                        },
-                                                      )
-                                                    ],
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(30),
-                                                          color: Colors.grey.withOpacity(0.4)
-                                                      ),
-                                                      padding: const EdgeInsets.only(left:3.0,right: 3.0),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const SizedBox(width: 10,),
-                                                           Expanded(
-                                                            child: TextField(
-                                                              onChanged: (val){
-                                                                pro.setCommentText(val);
-                                                              },
-                                                              controller: pro.commnetController,
-                                                              decoration: const InputDecoration(
-                                                                hintText: "Write a comment...",
-                                                                border: InputBorder.none,
+                                                                  );
+                                                                },
+                                                              );
+                                                            }else{
+                                                              return const Center(child: Text("No Commnets"),);
+                                                            }
+                                                          },
+                                                        )
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(30),
+                                                            color: Colors.grey.withOpacity(0.4)
+                                                        ),
+                                                        padding: const EdgeInsets.only(left:3.0,right: 3.0),
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            const SizedBox(width: 10,),
+                                                             Expanded(
+                                                              child: TextField(
+                                                                onChanged: (val){
+                                                                  pro.setCommentText(val);
+                                                                },
+                                                                controller: pro.commnetController,
+                                                                decoration: const InputDecoration(
+                                                                  hintText: "Write a comment...",
+                                                                  border: InputBorder.none,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                          IconButton(onPressed: (){
-                                                            pro.addComment(pro.feeds[i].docid, context);
-                                                          }, icon: const Icon(Icons.send))
-                                                        ],
+                                                            IconButton(onPressed: (){
+                                                              pro.addComment(pro.feeds[i].docid, context);
+                                                            }, icon: const Icon(Icons.send))
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  )
-                                                ],
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      });
-                                    }, icon:  Icon(Icons.comment)),
-                                    IconButton(onPressed: (){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: pro.feeds[i].profileName,profileImage: pro.feeds[i].profileImage,recieverPhone:pro.feeds[i].phone)));
-                                    }, icon:  Icon(Icons.chat_bubble)),
-                                    IconButton(onPressed: (){}, icon:  Icon(Icons.bathtub_sharp)),
-
+                                          );
+                                        });
+                                      },
+                                      child:  Image.asset(commentIcon,height: 30,width: 30,)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(onTap: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: pro.feeds[i].profileName,profileImage: pro.feeds[i].profileImage,recieverPhone:pro.feeds[i].phone)));
+                                      }, child:  Image.asset(chatIconNew,height: 30,width: 30,),),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(
+                                        onTap: (){},
+                                        child: Image.asset(giftICon,height: 30,width: 30,),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

@@ -1,6 +1,5 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
-import 'package:bono_gifts/routes/routes_names.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';

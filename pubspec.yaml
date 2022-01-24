@@ -93,6 +93,7 @@ flutter:
     - assets/
     - assets/images/
     - assets/images/icons/
+    - assets/feeds_icons/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

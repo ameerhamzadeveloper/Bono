@@ -1,11 +1,6 @@
 import 'package:bono_gifts/config/constants.dart';
-import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/routes/routes_names.dart';
-import 'package:bono_gifts/views/signup/phone_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
 

@@ -1,7 +1,5 @@
 import 'package:bono_gifts/config/constants.dart';
-import 'package:bono_gifts/models/signup_model.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';

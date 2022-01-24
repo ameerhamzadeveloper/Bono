@@ -1,6 +1,5 @@
 import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/routes/routes_names.dart';
-import 'package:bono_gifts/views/signup/veify_otp.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

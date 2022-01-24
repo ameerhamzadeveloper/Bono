@@ -7,13 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+
 class CreateProfile extends StatefulWidget {
   const CreateProfile({Key? key}) : super(key: key);
-
   @override
   _CreateProfileState createState() => _CreateProfileState();
 }
-
 class _CreateProfileState extends State<CreateProfile> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
   var formt = DateFormat('dd-MMM-yyyy');
@@ -293,7 +292,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       pro.makeWatingState();
                       pro.signUpUser(context);
                     },
-                    child: pro.isWaitingCon ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white),):const Text("Done",style: TextStyle(color: Colors.white),),
+                    child: pro.isWaitingCon ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white),):const Text("Done",style: TextStyle(color: Colors.white),),
                   )
                 ],
               ),

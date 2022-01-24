@@ -108,7 +108,7 @@ class SignUpProvider extends ChangeNotifier {
   }
   final service = SignUpService();
   addMarker(){
-    MarkerId markerId = MarkerId("map");
+    MarkerId markerId = const MarkerId("map");
     Marker marker =
     Marker(markerId: markerId, icon: BitmapDescriptor.defaultMarker, position: LatLng(latitude!,longitude!));
     markers[markerId] = marker;
@@ -141,7 +141,7 @@ class SignUpProvider extends ChangeNotifier {
 
   getUser()async{
     await service.getUser(phoneNumber.text).then((data){
-      print(data);
+
       phoneNumber = TextEditingController(text:data['phone']);
       name = data['name'];
       dob = data['dob'];
@@ -168,7 +168,7 @@ class SignUpProvider extends ChangeNotifier {
     var ph = pre.getString('phone');
     phoneNumber = TextEditingController(text: ph);
     phone = ph;
-    print(phone);
+
     if(phone != null || phone != '' || phoneNumber.text != null || phoneNumber.text != ''){
       getUser();
     }
@@ -192,7 +192,7 @@ class SignUpProvider extends ChangeNotifier {
     var todayDate = DateTime(d.year,d.month,d.day);
     var io = daOfBirth.difference(todayDate).inDays;
     diffDays = io.toString();
-    print(io);
+
   }
 
   makeWatingState(){
@@ -205,7 +205,7 @@ class SignUpProvider extends ChangeNotifier {
   }
 
   authUserWithPhone(){
-    print('$dailCode$phoneNumber');
+
     service.verifyPhone('$dailCode${phoneNumber.text}');
   }
   verifyOTP(BuildContext context)async{
@@ -249,10 +249,9 @@ class SignUpProvider extends ChangeNotifier {
   }
 
   getMyPhoto(){
-    print("====================");
     service.getMyPhotoy(phone!).then((value){
       for(var i in value.docs){
-        print("doc leng ${value.docs.length}");
+
         myPosts.add(i['image url']);
       }
       notifyListeners();

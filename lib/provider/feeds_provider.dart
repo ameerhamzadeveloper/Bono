@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:bono_gifts/config/constants.dart';
+import 'package:bono_gifts/config/destination.dart';
 import 'package:bono_gifts/models/feeds_models.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/services/feeds_services.dart';
@@ -28,6 +30,22 @@ class FeedsProvider extends ChangeNotifier{
   double transform = 0;
   late List<CameraDescription> camera;
   CameraController get cameraController => _cameraController;
+
+  static int index = 0;
+
+  setIndex(int ind){
+    index = ind;
+    print(index);
+    notifyListeners();
+  }
+
+   List<AllDestinations> allDestinations = [
+    AllDestinations(name: 'Chat', icon: index == 0 ? chatIconBlue :chatIconGrey),
+    AllDestinations(name: 'Buy', icon:index == 1 ? giftIconBlue : giftIConGrey),
+    AllDestinations(name: 'Feeds', icon:index == 2 ? feedIconBlue:feedIConGrey),
+    AllDestinations(name: 'Camera', icon:index == 3 ? cameraIconBlue:cameraIconGrey),
+    AllDestinations(name: 'Profile', icon: index == 4 ? profileIconBlue : profileIconGrey),
+  ];
   
   final colRef = FirebaseFirestore.instance.collection('userPosts');
 
@@ -133,7 +151,6 @@ class FeedsProvider extends ChangeNotifier{
 
         Navigator.pop(context);
       }
-      print(value);
     });
 
   }

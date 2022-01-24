@@ -5,7 +5,6 @@ import 'package:bono_gifts/views/loading_page.dart';
 import 'package:bono_gifts/views/not_found_page.dart';
 import 'package:bono_gifts/views/profile/profile.dart';
 import 'package:bono_gifts/views/signup/create_profile.dart';
-import 'package:bono_gifts/views/signup/delivery_address.dart';
 import 'package:bono_gifts/views/signup/phone_auth.dart';
 import 'package:bono_gifts/views/signup/select_dob.dart';
 import 'package:bono_gifts/views/signup/veify_otp.dart';
@@ -30,7 +29,7 @@ class CustomRoutes {
       case bottomNav:
         return MaterialPageRoute(builder: (_) => const BottomNavBar());
       case laoding:
-        return MaterialPageRoute(builder: (_) =>  LoadingPage());
+        return MaterialPageRoute(builder: (_) =>  const LoadingPage());
       case addPOst:
         return MaterialPageRoute(builder: (_) =>  AddPost());
     }

@@ -1,5 +1,4 @@
 import 'package:bono_gifts/provider/sign_up_provider.dart';
-import 'package:bono_gifts/routes/routes_names.dart';
 import 'package:bono_gifts/views/bottom_nav_bar.dart';
 import 'package:bono_gifts/views/signup/welcome_page.dart';
 import 'package:flutter/material.dart';

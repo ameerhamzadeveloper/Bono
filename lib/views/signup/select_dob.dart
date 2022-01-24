@@ -1,12 +1,13 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
-import 'package:bono_gifts/routes/routes_names.dart';
 import 'package:bono_gifts/views/signup/delivery_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 class SelectDOB extends StatefulWidget {
+  const SelectDOB({Key? key}) : super(key: key);
+
   @override
   _SelectDOBState createState() => _SelectDOBState();
 }
@@ -22,7 +23,7 @@ class _SelectDOBState extends State<SelectDOB> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              SizedBox(height: 30,),
+              const SizedBox(height: 30,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -63,10 +64,10 @@ class _SelectDOBState extends State<SelectDOB> {
                       // maxTime: DateTime.now(),
                       onChanged: (date) {
                         var formt = DateFormat('dd-MMM-yyyy');
-                        print(formt.format(date));
+
                         pro.setDOB(formt.format(date).toString(),date);
                       }, onConfirm: (date) {
-                        print('confirm $date');
+
                       },);
                       // currentTime: DateTime.now(), locale: LocaleType.en);
                 },

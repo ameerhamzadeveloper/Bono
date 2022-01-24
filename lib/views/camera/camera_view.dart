@@ -39,12 +39,12 @@ class CameraViewPage extends StatelessWidget {
               onPressed: () {}),
         ],
       ),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 150,
               child: Image.file(
@@ -57,9 +57,9 @@ class CameraViewPage extends StatelessWidget {
               child: Container(
                 color: Colors.black38,
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 child: TextFormField(
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 17,
                   ),
