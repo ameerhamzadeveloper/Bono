@@ -116,7 +116,7 @@ class SignUpProvider extends ChangeNotifier {
 
   signUpUser(BuildContext context){
     Map<String,dynamic> userMap = {
-      'phone':'$dailCode${phoneNumber.text}',
+      'phone':'$dailCode${phoneNumber.text.replaceAll(' ', '')}',
       'name': name,
       'dob': dob,
       'dobFormat':dobFormat,
@@ -127,13 +127,13 @@ class SignUpProvider extends ChangeNotifier {
       'buildingName':buildingName.text,
       'area':area.text,
       'street':street.text,
-      'searchPhone':phoneNumber.text,
+      'searchPhone':'0${phoneNumber.text}',
     };
     service.saveToFirebase(userMap).then((value){
       saveToShared();
       makeWatingDone();
       if(value)
-       { Navigator.pushReplacementNamed(context, profilePage);}
+       { Navigator.pushReplacementNamed(context, bottomNav);}
     });
   }
   Timestamp? userDate;
@@ -161,6 +161,7 @@ class SignUpProvider extends ChangeNotifier {
   saveToShared()async{
     SharedPreferences pre = await SharedPreferences.getInstance();
     pre.setString('phone', '$dailCode${phoneNumber.text}');
+    getUser();
   }
    getSharedData()async{
     SharedPreferences pre = await SharedPreferences.getInstance();
@@ -168,7 +169,7 @@ class SignUpProvider extends ChangeNotifier {
     phoneNumber = TextEditingController(text: ph);
     phone = ph;
     print(phone);
-    if(phone != null || phone != ''){
+    if(phone != null || phone != '' || phoneNumber.text != null || phoneNumber.text != ''){
       getUser();
     }
   }
@@ -207,15 +208,39 @@ class SignUpProvider extends ChangeNotifier {
     print('$dailCode$phoneNumber');
     service.verifyPhone('$dailCode${phoneNumber.text}');
   }
-  verifyOTP(BuildContext context){
-    service.verifyOTP(otp!).then((value){
+  verifyOTP(BuildContext context)async{
+    service.verifyOTP(otp!).then((value)async{
       isWaitingCon = false;
       if(!value){
         otpErro = 'Invalid OTP';
       }else{
-        Navigator.pushNamed(context, dobPage);
+        await service.checkIfUserAlready('$dailCode${phoneNumber.text}').then((value){
+          print(value);
+          if(value.exists == true){
+            print("USer called Exist");
+            saveToShared();
+            Navigator.pushNamed(context, bottomNav);
+          }else{
+            print("USer called Not Exost");
+            Navigator.pushNamed(context, dobPage);
+          }
+        });
+
       }
       notifyListeners();
+    });
+  }
+  checkIfUSer(String phone){
+    service.checkIfUserAlready(phone).then((value){
+      print(value);
+      if(value.exists == true){
+        print("USer Esxit");
+        // saveToShared();
+        // Navigator.pushNamed(context, bottomNav);
+      }else{
+        print("User Not Exis");
+        // Navigator.pushNamed(context, dobPage);
+      }
     });
   }
 

@@ -17,7 +17,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<SignUpProvider>(context,listen: false).getUser();
   }
   var formtr = DateFormat('MMM');
   @override

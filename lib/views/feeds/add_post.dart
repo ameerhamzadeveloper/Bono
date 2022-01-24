@@ -119,7 +119,7 @@ class _AddPostState extends State<AddPost> {
                       ),
                       MaterialButton(
                         color: Colors.blue,
-                        onPressed: (){
+                        onPressed: isClicked ? null :(){
                           if(keyy.currentState!.validate() || pro.image != null){
                             setState(() {
                               isClicked = true;
@@ -131,7 +131,7 @@ class _AddPostState extends State<AddPost> {
                             });
                           }
                         },
-                        child: isClicked ? const CircularProgressIndicator():const Text("Post",style: TextStyle(color: Colors.white),),
+                        child: isClicked ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white),):const Text("Post",style: TextStyle(color: Colors.white),),
                       )
                     ],
                   )

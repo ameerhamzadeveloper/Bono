@@ -115,7 +115,10 @@ class _SelectDOBState extends State<SelectDOB> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: ()=>Navigator.pop(context),
+                    onPressed: (){
+                      pro.checkIfUSer('+923033374110');
+                      // Navigator.pop(context);
+                      },
                     child: const Text("Cancel"),
                   ),
                   MaterialButton(

@@ -1,3 +1,4 @@
+import 'package:bono_gifts/provider/chat_provider.dart';
 import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/routes/custom_routes.dart';
@@ -23,6 +24,9 @@ class MyApp extends StatelessWidget {
          ),
         ChangeNotifierProvider<FeedsProvider>(
           create: (context) => FeedsProvider(),
+        ),
+        ChangeNotifierProvider<ChatProvider>(
+          create: (context) => ChatProvider(),
         ),
       ],
       child: MaterialApp(

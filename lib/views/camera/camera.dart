@@ -1,11 +1,12 @@
 import 'dart:math';
+import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/views/camera/camera_view.dart';
 import 'package:bono_gifts/views/camera/video_view.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
-late List<CameraDescription> camera;
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({Key? key}) : super(key: key);
@@ -15,50 +16,34 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late CameraController _cameraController;
-  late Future<void> cameraValue;
-  bool isRecoring = false;
-  bool flash = false;
-  bool iscamerafront = true;
-  double transform = 0;
+
 
   @override
   void initState() {
     super.initState();
-    getCamera();
-
-  }
-
-  getCamera()async{
-    await availableCameras().then((value) {
-      setState(() {
-        camera = value;
-      });
-      _cameraController = CameraController(camera[0], ResolutionPreset.high);
-      cameraValue = _cameraController.initialize();
-    });
+    Provider.of<FeedsProvider>(context,listen: false).getCamera();
   }
   @override
   void dispose() {
     super.dispose();
-    _cameraController.dispose();
+    Provider.of<FeedsProvider>(context,listen: false).dispostCameraController();
   }
-
   @override
   Widget build(BuildContext context) {
+    final pro =  Provider.of<FeedsProvider>(context);
     return Scaffold(
       body: Stack(
         children: [
           FutureBuilder(
-              future: cameraValue,
+              future: pro.cameraValue,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: CameraPreview(_cameraController));
+                      child: CameraPreview(pro.cameraController));
                 } else {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -67,7 +52,7 @@ class _CameraScreenState extends State<CameraScreen> {
             bottom: 0.0,
             child: Container(
               color: Colors.black,
-              padding: EdgeInsets.only(top: 5, bottom: 5),
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
@@ -77,49 +62,22 @@ class _CameraScreenState extends State<CameraScreen> {
                     children: [
                       IconButton(
                           icon: Icon(
-                            flash ? Icons.flash_on : Icons.flash_off,
+                            pro.flash ? Icons.flash_on : Icons.flash_off,
                             color: Colors.white,
                             size: 28,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              flash = !flash;
-                            });
-                            flash
-                                ? _cameraController
-                                .setFlashMode(FlashMode.torch)
-                                : _cameraController.setFlashMode(FlashMode.off);
-                          }),
+                          onPressed: () => pro.onOFfFlash()),
                       GestureDetector(
-                        onLongPress: () async {
-                          await _cameraController.startVideoRecording();
-                          setState(() {
-                            isRecoring = true;
-                          });
-                        },
-                        onLongPressUp: () async {
-                          XFile videopath =
-                          await _cameraController.stopVideoRecording();
-                          setState(() {
-                            isRecoring = false;
-                          });
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => VideoViewPage(
-                                    path: videopath.path,
-                                  )));
-                        },
-                        onTap: () {
-                          if (!isRecoring) takePhoto(context);
-                        },
-                        child: isRecoring
-                            ? Icon(
+                        onLongPress: () =>pro.recordVideo(),
+                        onLongPressUp: () => pro.stopRecordVideo(context),
+                        onTap: ()=> pro.takePhotoProvider(context),
+                        child: pro.isRecoring
+                            ? const Icon(
                           Icons.radio_button_on,
                           color: Colors.red,
                           size: 80,
                         )
-                            : Icon(
+                            : const Icon(
                           Icons.panorama_fish_eye,
                           color: Colors.white,
                           size: 70,
@@ -127,29 +85,20 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                       IconButton(
                           icon: Transform.rotate(
-                            angle: transform,
-                            child: Icon(
+                            angle: pro.transform,
+                            child: const Icon(
                               Icons.flip_camera_ios,
                               color: Colors.white,
                               size: 28,
                             ),
                           ),
-                          onPressed: () async {
-                            setState(() {
-                              iscamerafront = !iscamerafront;
-                              transform = transform + pi;
-                            });
-                            int cameraPos = iscamerafront ? 0 : 1;
-                            _cameraController = CameraController(
-                                camera[cameraPos], ResolutionPreset.high);
-                            cameraValue = _cameraController.initialize();
-                          }),
+                          onPressed: () => pro.flipCamera()),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 4,
                   ),
-                  Text(
+                  const Text(
                     "Hold for Video, tap for photo",
                     style: TextStyle(
                       color: Colors.white,
@@ -165,13 +114,5 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  void takePhoto(BuildContext context) async {
-    XFile file = await _cameraController.takePicture();
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (builder) => CameraViewPage(
-              path: file.path,
-            )));
-  }
+
 }

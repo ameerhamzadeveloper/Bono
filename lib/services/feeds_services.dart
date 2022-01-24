@@ -8,7 +8,7 @@ class FeedsService{
 
   Future<bool> savePost(Map<String,dynamic> map) async {
     final CollectionReference ref = FirebaseFirestore.instance.collection('userPosts');
-    final CollectionReference comRef = FirebaseFirestore.instance.collection('userPosts').doc(map['phone']).collection('comments');
+    // final CollectionReference comRef = FirebaseFirestore.instance.collection('userPosts').doc(map['phone']).collection('comments');
       var snapshot = await FirebaseStorage.instance.ref().child('Posts Pictures/${map['phone']}').putData(map['image']);
       var url = (await snapshot.ref.getDownloadURL()).toString();
       var userData = {
@@ -20,7 +20,9 @@ class FeedsService{
         'profileImage': map['profileImage'],
         'profileName':map['profileName'],
       };
-      await ref.add(userData);
+      await ref.add(userData).then((value){
+        print("Posted");
+      });
 
 
     return true;

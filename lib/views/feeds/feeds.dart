@@ -115,19 +115,7 @@ class _FeedsState extends State<Feeds> {
                         ),
                         Stack(
                           children: [
-                            Container(
-                              height: 230,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  // borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(
-                                      fit: BoxFit.fill,
-                                      image: NetworkImage(
-                                        pro.feeds[i].image,
-                                      )
-                                  )
-                              ),
-                            ),
+                            Image.network(pro.feeds[i].image,width: getWidth(context),fit: BoxFit.cover,),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Container(
@@ -158,7 +146,7 @@ class _FeedsState extends State<Feeds> {
                                                       const SizedBox(height: 20,),
                                                       const Divider(),
                                                       StreamBuilder(
-                                                        stream: pro.colRef.doc(pro.feeds[i].phone).collection('comments').snapshots(),
+                                                        stream: pro.colRef.doc(pro.feeds[i].docid).collection('comments').snapshots(),
                                                         builder: (context,AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot){
                                                           if(snapshot.connectionState == ConnectionState.waiting){
                                                             return Center(child: CircularProgressIndicator(),);
@@ -236,7 +224,7 @@ class _FeedsState extends State<Feeds> {
                                                             ),
                                                           ),
                                                           IconButton(onPressed: (){
-                                                            pro.addComment(pro.feeds[i].phone, context);
+                                                            pro.addComment(pro.feeds[i].docid, context);
                                                           }, icon: const Icon(Icons.send))
                                                         ],
                                                       ),

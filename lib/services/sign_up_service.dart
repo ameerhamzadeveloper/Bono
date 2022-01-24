@@ -56,6 +56,10 @@ class SignUpService{
       return false;
     }
   }
+  Future<DocumentSnapshot> checkIfUserAlready(String phone)async{
+    Future<DocumentSnapshot> val = firestore.collection('users').doc(phone).get();
+    return val;
+  }
 
   Future<bool> saveToFirebase(Map<String,dynamic> map) async {
     String defaultImage = "https://firebasestorage.googleapis.com/v0/b/bonogifts.appspot.com/o/profile.png?alt=media&token=dec6afee-44f3-4876-8f2b-dbb2be0dd4d8";
@@ -77,6 +81,7 @@ class SignUpService{
         'area':map['area'],
         'street':map['street'],
         'searchPhone':map['searchPhone'],
+        'searchPhone1':'00${map['phone'].toString().substring(1,map['phone'].length)}'
       };
 
       await ref.set(userData);
@@ -100,6 +105,7 @@ class SignUpService{
         'area':map['area'],
         'street':map['street'],
         'searchPhone':map['searchPhone'],
+        'searchPhone1':'00${map['phone'].toString().substring(1,map['phone'].length)}'
       };
       await ref.set(userData);
     }

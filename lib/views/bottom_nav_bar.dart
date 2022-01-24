@@ -1,10 +1,12 @@
 import 'package:bono_gifts/config/destination.dart';
+import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/views/buy/buy.dart';
 import 'package:bono_gifts/views/camera/camera.dart';
 import 'package:bono_gifts/views/chat/chat.dart';
 import 'package:bono_gifts/views/feeds/feeds.dart';
 import 'package:bono_gifts/views/profile/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({Key? key}) : super(key: key);
 
@@ -21,6 +23,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
     CameraScreen(),
     const ProfilePage()
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<SignUpProvider>(context,listen: false).getUser();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +39,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
         selectedItemColor: Colors.black,

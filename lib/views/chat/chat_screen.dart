@@ -17,6 +17,17 @@ class _ChatScreenState extends State<ChatScreen> {
   DateTime date = DateTime.now();
    FirebaseFirestore firestore = FirebaseFirestore.instance;
    TextEditingController message = TextEditingController();
+   int count = 0;
+
+   @override
+  void initState() {
+    super.initState();
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    firestore.collection('recentChats').doc(widget.recieverPhone).collection(pro.phone!).get().then((value){
+      var countt = value.docs[0]['count'];
+      count = countt++;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final pro = Provider.of<SignUpProvider>(context);
@@ -31,20 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         centerTitle: false,
         title: Text(widget.recieverName.toString(),style: TextStyle(color: Colors.black),),
-        actions: [
-          // IconButton(
-          //   onPressed: () {
-          //     pro.joinAudioMeeting();
-          //   },
-          //   icon: Icon(Icons.call, color: Colors.black,),
-          // ),
-          // IconButton(
-          //   onPressed: () {
-          //     pro.joinVideoMeeting();
-          //   },
-          //   icon: Icon(Icons.videocam_outlined, color: Colors.black,),
-          // )
-        ],
+
       ),
       body: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
@@ -134,6 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         'recieverID':widget.recieverPhone,
                         'senderID':pro.phone,
                         'profileImage':pro.userImage,
+                        'count': count == 0 ? 1 : count,
                       });
                       firestore.collection('recentChats').doc(widget.recieverPhone).collection('myChats').doc(pro.phone).set({
                         'lastMessage':message.text,
