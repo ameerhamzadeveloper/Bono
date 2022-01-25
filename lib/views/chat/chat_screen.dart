@@ -1,9 +1,20 @@
- import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'dart:io';
+
+import 'package:auto_size_text_field/auto_size_text_field.dart';
+import 'package:bono_gifts/config/constants.dart';
+import 'package:bono_gifts/provider/chat_provider.dart';
+import 'package:bono_gifts/services/chat_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class ChatScreen extends StatefulWidget {
+
   final String recieverName;
   final String profileImage;
   final String recieverPhone;
@@ -14,19 +25,57 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  int lastIndex = 0;
+  late AutoScrollController chatController;
+  int messageCount = 0;
   DateTime date = DateTime.now();
    FirebaseFirestore firestore = FirebaseFirestore.instance;
    TextEditingController message = TextEditingController();
+  bool emojiShowing = false;
+
+  _onBackspacePressed() {
+    message
+      ..text = message.text.characters.skipLast(1).toString()
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: message.text.length));
+  }
+
+
+  _onEmojiSelected(Emoji emoji) {
+    message
+      ..text += emoji.emoji
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: message.text.length));
+  }
+  Future _scrollChat(int index) async {
+    await chatController.scrollToIndex(index,
+        preferPosition: AutoScrollPosition.begin);
+  }
+   
+   @override
+  void initState() {
+    super.initState();
+    chatController = AutoScrollController(
+        viewportBoundaryGetter: () =>
+            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+        axis: Axis.horizontal);
+    firestore.collection('recentChats').doc(widget.recieverPhone).snapshots().listen((event) {
+      messageCount = int.parse(event.data()?['count']);
+      print("${event.data()}");
+      print(messageCount);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final pro = Provider.of<SignUpProvider>(context);
+    final proChat = Provider.of<ChatProvider>(context);
     final Stream<QuerySnapshot> documentStream = firestore.collection('chats').doc(pro.phone.toString()).collection(widget.recieverPhone).orderBy('timestamp').snapshots();
     return Scaffold(
       body: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
@@ -71,7 +120,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Row(
-                        children: [
+                        children: const [
                           Icon(Icons.motorcycle_rounded),
                           Text("35 min")
                         ],
@@ -82,12 +131,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     SizedBox(width: 10,),
                   Column(
                     children: [
-                      Icon(Icons.more_horiz),
+                      const Icon(Icons.more_horiz),
                       Image.asset("assets/images/icons/product_icon.png",height: 20,width: 20,)
                     ],
-                  )
-                ],
-              ),])
+                   ),
+                 ],
+                ),
+              ],
+             ),
             ),
           ),
           Expanded(
@@ -97,7 +148,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 if(snapshot.data == null){
                   return Container();
                 }else{
+                  lastIndex = snapshot.data!.docs.length;
                   return ListView(
+                    controller: chatController,
                     // physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     children: snapshot.data!.docs.map((DocumentSnapshot document) {
@@ -108,7 +161,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           crossAxisAlignment:
                           data['senderID'] == pro.phone ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                           children: <Widget>[
-                            Material(
+                            if(data['messageType'] == 'text')...[
+                              Material(
                               borderRadius: data['senderID'] == pro.phone
                                   ? const BorderRadius.only(
                                   topLeft: Radius.circular(30.0),
@@ -132,6 +186,16 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                               ),
                             ),
+                            ]else if(data['messageType'] == 'image')...[
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.lightBlueAccent,
+                                  borderRadius: BorderRadius.circular(10)
+                                ),
+                                width: getWidth(context) / 2,
+                                child: Image.network(data['message'],alignment: data['senderID'] == pro.phone ? Alignment.centerRight : Alignment.centerLeft,))
+                            ],
                           ],
                         ),
                       );
@@ -147,10 +211,25 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: (){},
-                    icon: Icon(Icons.camera_alt),
+                    onPressed: () async {
+                      XFile? image;
+                      final ImagePicker _picker = ImagePicker();
+                      image = await _picker.pickImage(
+                          source : ImageSource.gallery);
+                      if (image == null) return;
+                      var bytes = await image.readAsBytes();
+                      if(bytes != null) {
+                        print(image.path);
+                      String filename = image.path.split("/").last;
+                      String imageUrl = await ChatService().uploadImage(bytes, widget.recieverPhone, filename,pro.phone!);
+                      print(imageUrl);
+                      proChat.sendImageMessage(context, imageUrl, widget.recieverPhone, messageCount.toString(), widget.recieverName, widget.profileImage);
+                      }
+                    },
+                    icon: const Icon(Icons.camera_alt),
                   ),
-                  Expanded(child: Padding(
+                  Expanded(
+                    child: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Container(
                       padding: const EdgeInsets.all(4.0),
@@ -158,15 +237,27 @@ class _ChatScreenState extends State<ChatScreen> {
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.white,
                       ),
-                      height: 45,
-
+                      // height: 50,
                       child: Center(
-                        child: TextField(
+                        child: AutoSizeTextField(
+                          maxLines: null,
+                          onTap: (){
+                            if(message.text.length > 0){
+                              setState(() {
+                                emojiShowing = !emojiShowing;
+                              });
+                            }
+                          },
                           controller: message,
                           decoration:  InputDecoration(
                               border: InputBorder.none,
                               hintText: "Type Your Message",
-                            suffixIcon: IconButton(onPressed: (){}, icon: Icon(Icons.star,color: Colors.lightBlueAccent,)),
+                            suffixIcon: IconButton(onPressed: (){
+                              setState(() {
+                                emojiShowing = !emojiShowing;
+                                SystemChannels.textInput.invokeMethod('TextInput.hide');
+                              });
+                            }, icon: Icon(Icons.star,color: Colors.lightBlueAccent,)),
                             // prefix: IconButton(onPressed: (){}, icon: Icon(Icons.star,color: Colors.lightBlueAccent,)),
                           ),
                         ),
@@ -181,48 +272,49 @@ class _ChatScreenState extends State<ChatScreen> {
                  MaterialButton(
                    minWidth: 20,
                    onPressed: (){
-                     firestore.collection('chats').doc(pro.phone.toString()).collection(widget.recieverPhone).add({
-                       'message':message.text,
-                       'date': "${date.year}/${date.month}/${date.day}",
-                       'timestamp':DateTime.now(),
-                       'recieverID':widget.recieverPhone,
-                       'senderID':pro.phone,
-                       'profileImage':pro.userImage,
+                     setState(() {
+                       messageCount++;
                      });
-                     firestore.collection('chats').doc(widget.recieverPhone).collection(pro.phone.toString()).add({
-                       'message':message.text,
-                       'date': "${date.year}/${date.month}/${date.day}",
-                       'timestamp':DateTime.now(),
-                       'recieverID':widget.recieverPhone,
-                       'senderID':pro.phone,
-                       'profileImage':pro.userImage,
-                     });
-                     firestore.collection('recentChats').doc(widget.recieverPhone).collection('myChats').doc(pro.phone).set({
-                       'lastMessage':message.text,
-                       'date': "${date.year}/${date.month}/${date.day}",
-                       'timestamp':DateTime.now(),
-                       'recieverID':widget.recieverPhone,
-                       'senderID':pro.phone,
-                       'recieverName':pro.name,
-                       'profileImage':pro.userImage,
-                       // 'token': widget.fcmToken,
-                     });
-                     firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').doc(widget.recieverPhone).set({
-                       'lastMessage':message.text,
-                       'date': "${date.year}/${date.month}/${date.day}",
-                       'timestamp':DateTime.now(),
-                       'recieverID':widget.recieverPhone,
-                       'senderID':pro.phone,
-                       'recieverName':widget.recieverName,
-                       'profileImage':widget.profileImage,
-                       // 'token':widget.fcmToken,
-                     });
+                     proChat.sendTextMessage(context, message, widget.recieverPhone, messageCount.toString(), widget.recieverName, widget.profileImage);
                      message.clear();
+                     _scrollChat(lastIndex);
                    },
                    child: Image.asset("assets/images/icons/arrow_icon.png",height: 20,width: 20,),
                  )
                 ],
               ),
+            ),
+          ),
+          Offstage(
+            offstage: !emojiShowing,
+            child: SizedBox(
+              height: 250,
+              child: EmojiPicker(
+                  onEmojiSelected: (Category category, Emoji emoji) {
+                    _onEmojiSelected(emoji);
+                  },
+                  onBackspacePressed: _onBackspacePressed,
+                  config: Config(
+                      columns: 7,
+                      // Issue: https://github.com/flutter/flutter/issues/28894
+                      emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                      verticalSpacing: 0,
+                      horizontalSpacing: 0,
+                      initCategory: Category.RECENT,
+                      bgColor: const Color(0xFFF2F2F2),
+                      indicatorColor: Colors.blue,
+                      iconColor: Colors.grey,
+                      iconColorSelected: Colors.blue,
+                      progressIndicatorColor: Colors.blue,
+                      backspaceColor: Colors.blue,
+                      showRecentsTab: true,
+                      recentsLimit: 28,
+                      noRecentsText: 'No Recents',
+                      noRecentsStyle: const TextStyle(
+                          fontSize: 20, color: Colors.black26),
+                      tabIndicatorAnimDuration: kTabScrollDuration,
+                      categoryIcons: const CategoryIcons(),
+                      buttonMode: ButtonMode.MATERIAL)),
             ),
           ),
         ],

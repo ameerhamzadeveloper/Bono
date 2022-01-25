@@ -1,7 +1,9 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/helper/country_code_without_plus.dart';
 import 'package:bono_gifts/helper/helper.dart';
+import 'package:bono_gifts/provider/chat_provider.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
+import 'package:bono_gifts/services/chat_service.dart';
 import 'package:bono_gifts/views/chat/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,10 +56,8 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
         });
       }
     }
-    // compareDBListDailCode();
-    compareContactListDailCode();
-    Future.delayed(Duration(seconds: 3),(){
-      matchTheList();
+    Future.delayed(const Duration(seconds: 2),(){
+      fetchNewtrork();
     });
   }
 
@@ -107,36 +107,61 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
     // }
   }
 
-  matchTheList(){
-    print(phones);
-    print("new Cont ${newContList.toSet().toList()}");
-    for(var i = 0;i< phones.length;i++){
-      for(var j =0;j<contactList.toSet().toList().length;j++){
-        if(contactList.toSet().toList()[j].contains(phones[i])){
-          print("iorere ${contactList[j]}");
-          setState(() {
-            newList.add(contactList[j]);
-          });
-        }
-      }
-    }
-    Future.delayed(Duration(seconds: 2),(){
-      fetchNewtrork();
-    });
-  }
   List<NewtWorkModel> netWorkLsit = [];
+  final service = ChatService();
 
   fetchNewtrork(){
-    print("called");
-    print(newList.length);
-    for(var i = 0; i<newList.length;i++){
-      FirebaseFirestore.instance.collection('users').where('phone', isLessThanOrEqualTo: newList[i]).get().then((value){
-        print(value.docs[i].id);
-        setState(() {
-          netWorkLsit.add(NewtWorkModel(name: value.docs[i]['name'], phone: value.docs[i]['phone'], photo: value.docs[i]['profile_url'],isSelect: false));
-        });
+    for (var i = 0; i < contactList.length; i++) {
+      service.fetchSearch1(contactList, i, 'searchPhone1').then((value) {
+        for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
+          if(!netWorkLsit.contains(value.docs[d]['phone'])) {
+          setState(() {
+            netWorkLsit.add(NewtWorkModel(
+                name: value.docs[d]['name'],
+                phone: value.docs[d]['phone'],
+                photo: value.docs[d]['profile_url'],
+                isSelect: false));
+          });
+        }
+        }
+      });
+      service.fetchSearch1(contactList, i, 'phone').then((value) {
+        for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
+          if(!netWorkLsit.contains(value.docs[d]['phone'])) {
+          setState(() {
+            netWorkLsit.add(NewtWorkModel(
+                name: value.docs[d]['name'],
+                phone: value.docs[d]['phone'],
+                photo: value.docs[d]['profile_url'],
+                isSelect: false));
+          });
+        }}
+      });
+      service.fetchSearch1(contactList, i, 'searchPhone').then((value) {
+        for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
+          if(!netWorkLsit.contains(value.docs[d]['phone'])) {
+         setState(() {
+           netWorkLsit.add(NewtWorkModel(
+               name: value.docs[d]['name'],
+               phone: value.docs[d]['phone'],
+               photo: value.docs[d]['profile_url'],
+               isSelect: false));
+         });
+        }}
       });
     }
+    Future.delayed(Duration(seconds: 2),(){
+      removeDuplicate();
+    });
+  }
+
+  removeDuplicate(){
+   setState(() {
+     netWorkLsit.toSet().toList();
+   });
   }
   void pro(){
     print(newContList);
@@ -189,19 +214,20 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    getFirebaseContact();
+    getContacts();
 
   }
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     final pro = Provider.of<SignUpProvider>(context);
-    final Stream<QuerySnapshot> documentStream = firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').snapshots();
+    final Stream<QuerySnapshot> documentStream = firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').orderBy('timestamp').snapshots();
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.asset(logo,height: 100,width: 100,),
+            Image.asset(logo,height: 70,width: 70,),
             const SizedBox(height: 10,),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -268,8 +294,11 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                         Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
                         return InkWell(
                           onTap: (){
+                            print(data['recieverName']);
+                            print(data['recieverID']);
+
                             Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => ChatScreen(profileImage: data['profileImage'],recieverName: data['recieverName'],recieverPhone: data['recieverID'],)
+                                builder: (context) => ChatScreen(profileImage: data['profileImage'],recieverName: data['recieverName'],recieverPhone: data['recieverID'] == pro.phone ? data['senderID'] : data['recieverID'],)
                             ));
                           },
                           child: Container(
@@ -297,7 +326,9 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                   SlidableAction(
                                     // An action can be bigger than the others.
                                     flex: 2,
-                                    onPressed: (c){},
+                                    onPressed: (c){
+                                      print(data['isSeen']);
+                                    },
                                     backgroundColor: Colors.grey,
                                     foregroundColor: Colors.white,
                                     icon: Icons.list,
@@ -326,15 +357,27 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                   leading: CircleAvatar(
                                     backgroundImage: NetworkImage(data['profileImage']),
                                   ),
-                                  subtitle: Text(data['lastMessage']),
+                                  subtitle: data['messageType'] == 'image' ? Row(
+                                    children: [
+                                      Icon(Icons.insert_photo_rounded,color: Colors.grey,),
+                                      Text("Image")
+                                    ],
+                                  ):Text(data['lastMessage'].toString().length > 10 ?  "${data['lastMessage'].toString().substring(0,10)}..." : data['lastMessage']),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(data['date']),
-                                      SizedBox(height: 4,),
+                                      const SizedBox(height: 4,),
                                       CircleAvatar(
+                                        backgroundColor: Colors.white,
                                         radius: 10,
-                                        child: Center(child: Text("2",style: TextStyle(fontSize: 9),)),
+                                        child: Center(child: data['isSendMe'] == true ? data['isSeen'] == true ? Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.check,size: 10,),
+                                            Icon(Icons.check,size: 10,),
+                                          ],
+                                        ): Icon(Icons.check,size: 10,): Text(data['count'],style: TextStyle(fontSize: 9),)),
                                       )
                                     ],
                                   ),
@@ -583,7 +626,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                 ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: netWorkLsit.length,
+                  itemCount: netWorkLsit.toSet().toList().length,
                   itemBuilder: (contxt,i){
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -593,23 +636,23 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage: NetworkImage(netWorkLsit[i].photo),
+                                backgroundImage: NetworkImage(netWorkLsit.toSet().toList()[i].photo),
                               ),
                               SizedBox(width: 10,),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(netWorkLsit[i].name,style: TextStyle(fontSize: 18),),
-                                  Text(netWorkLsit[i].phone),
+                                  Text(netWorkLsit.toSet().toList()[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(netWorkLsit.toSet().toList()[i].phone),
                                 ],
                               ),
                             ],
                           ),
                           Checkbox(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                              value: netWorkLsit[i].isSelect, onChanged: (val){
+                              value: netWorkLsit.toSet().toList()[i].isSelect, onChanged: (val){
                             makeNetWorkSelect(i);
-                            if(netWorkLsit[i].isSelect == true){
+                            if(netWorkLsit.toSet().toList()[i].isSelect == true){
                               setState(() {
                                 moveList.add(NewtWorkModel(
                                     name: netWorkLsit[i].name,

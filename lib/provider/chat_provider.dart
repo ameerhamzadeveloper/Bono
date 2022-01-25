@@ -1,9 +1,12 @@
 import 'package:bono_gifts/models/contact_model.dart';
 import 'package:bono_gifts/models/network_cat_model.dart';
 import 'package:bono_gifts/models/network_model.dart';
+import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/services/chat_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:provider/provider.dart';
 
 class ChatProvider extends ChangeNotifier {
   List<String> phones = [];
@@ -11,6 +14,8 @@ class ChatProvider extends ChangeNotifier {
   List<String> newList = [];
   List<ContModel> nameCont = [];
   List<NewtWorkModel> moveList = [];
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   makeNetWorkSelect(int index) {
     netWorkLsit[index].isSelect = !netWorkLsit[index].isSelect;
@@ -73,9 +78,10 @@ class ChatProvider extends ChangeNotifier {
         notifyListeners();
       }
     }
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       fetchNewtrork();
     });
+    notifyListeners();
   }
 
   List<NewtWorkModel> netWorkLsit = [];
@@ -98,6 +104,7 @@ class ChatProvider extends ChangeNotifier {
     for (var i = 0; i < contactList.length; i++) {
       service.fetchSearch1(contactList, i, 'searchPhone1').then((value) {
         for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
           netWorkLsit.add(NewtWorkModel(
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
@@ -107,6 +114,7 @@ class ChatProvider extends ChangeNotifier {
       });
       service.fetchSearch1(contactList, i, 'phone').then((value) {
         for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
           netWorkLsit.add(NewtWorkModel(
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
@@ -116,6 +124,7 @@ class ChatProvider extends ChangeNotifier {
       });
       service.fetchSearch1(contactList, i, 'searchPhone').then((value) {
         for (var d = 0; d < value.docs.length; d++) {
+          print(value.docs[d]['name']);
           netWorkLsit.add(NewtWorkModel(
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
@@ -124,5 +133,127 @@ class ChatProvider extends ChangeNotifier {
         }
       });
     }
+    notifyListeners();
+  }
+  DateTime date = DateTime.now();
+
+  sendTextMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).add({
+      'message':message.text,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'text',
+    });
+    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).add({
+      'message':message.text,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'text',
+    });
+    firestore.collection('recentChats').doc(recieverPhone).collection('myChats').doc(pro.phone).set({
+      'lastMessage':message.text,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':pro.name,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'text',
+      // 'token': widget.fcmToken,
+    });
+    firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').doc(recieverPhone).set({
+      'lastMessage':message.text,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':recieverName,
+      'profileImage':profileImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'text',
+      // 'token':widget.fcmToken,
+    });
+  }
+
+  sendImageMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).add({
+      'message':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'image',
+    });
+    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).add({
+      'message':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'image',
+    });
+    firestore.collection('recentChats').doc(recieverPhone).collection('myChats').doc(pro.phone).set({
+      'lastMessage':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':pro.name,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'image',
+      // 'token': widget.fcmToken,
+    });
+    firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').doc(recieverPhone).set({
+      'lastMessage':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':recieverName,
+      'profileImage':profileImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'image',
+      // 'token':widget.fcmToken,
+    });
   }
 }
