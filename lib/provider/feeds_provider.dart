@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 class FeedsProvider extends ChangeNotifier{
@@ -177,6 +178,23 @@ class FeedsProvider extends ChangeNotifier{
 
   setCommentText(String val){
     commnetController = TextEditingController(text: val);
+  }
+
+
+  List<AssetEntity> imageList = [];
+
+  getPhotoGAllery()async{
+    var result = await PhotoManager.requestPermissionExtend();
+    if (result.isAuth) {
+      List<AssetPathEntity> list = await PhotoManager.getAssetPathList(onlyAll: true,);
+      List<AssetEntity> media = await list[0].getAssetListPaged(0, 20);
+      imageList = media;
+      notifyListeners();
+      // success
+    } else {
+      // fail
+      /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
+    }
   }
 
 

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bono_gifts/models/contact_model.dart';
 import 'package:bono_gifts/models/network_cat_model.dart';
 import 'package:bono_gifts/models/network_model.dart';
@@ -14,6 +17,16 @@ class ChatProvider extends ChangeNotifier {
   List<String> newList = [];
   List<ContModel> nameCont = [];
   List<NewtWorkModel> moveList = [];
+
+  AudioCache audio = AudioCache(fixedPlayer: AudioPlayer());
+
+  playSendMusic(){
+    audio.play("send.wav");
+  }
+  playRecieveMessage(){
+    audio.play("receive.wav");
+  }
+
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -137,9 +150,18 @@ class ChatProvider extends ChangeNotifier {
   }
   DateTime date = DateTime.now();
 
+  String docId = '';
+
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars = 'BCDEFGxcbHIJKLsdfdMNOPhfQRSTUdfdfcvVWXYZ';
+    docId = List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  }
+
   sendTextMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
     final pro = Provider.of<SignUpProvider>(context,listen: false);
-    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).add({
+    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).doc(docId).set({
       'message':message.text,
       'date': "${date.year}/${date.month}/${date.day}",
       'timestamp':DateTime.now(),
@@ -151,8 +173,10 @@ class ChatProvider extends ChangeNotifier {
       'isSeen':false,
       'isOnline':true,
       'messageType': 'text',
+      'isFavorite':false,
+      'id':docId,
     });
-    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).add({
+    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).doc(docId).set({
       'message':message.text,
       'date': "${date.year}/${date.month}/${date.day}",
       'timestamp':DateTime.now(),
@@ -164,6 +188,8 @@ class ChatProvider extends ChangeNotifier {
       'isSeen':false,
       'isOnline':false,
       'messageType': 'text',
+      'isFavorite':false,
+      'id':docId,
     });
     firestore.collection('recentChats').doc(recieverPhone).collection('myChats').doc(pro.phone).set({
       'lastMessage':message.text,
@@ -195,11 +221,12 @@ class ChatProvider extends ChangeNotifier {
       'messageType': 'text',
       // 'token':widget.fcmToken,
     });
+    playSendMusic();
   }
 
   sendImageMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
     final pro = Provider.of<SignUpProvider>(context,listen: false);
-    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).add({
+    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).doc(docId).set({
       'message':message,
       'date': "${date.year}/${date.month}/${date.day}",
       'timestamp':DateTime.now(),
@@ -211,8 +238,10 @@ class ChatProvider extends ChangeNotifier {
       'isSeen':false,
       'isOnline':true,
       'messageType': 'image',
+      'isFavorite':false,
+      'id':docId,
     });
-    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).add({
+    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).doc(docId).set({
       'message':message,
       'date': "${date.year}/${date.month}/${date.day}",
       'timestamp':DateTime.now(),
@@ -224,6 +253,8 @@ class ChatProvider extends ChangeNotifier {
       'isSeen':false,
       'isOnline':false,
       'messageType': 'image',
+      'isFavorite':false,
+      'id':docId,
     });
     firestore.collection('recentChats').doc(recieverPhone).collection('myChats').doc(pro.phone).set({
       'lastMessage':message,
@@ -255,5 +286,10 @@ class ChatProvider extends ChangeNotifier {
       'messageType': 'image',
       // 'token':widget.fcmToken,
     });
+    playSendMusic();
+  }
+
+  likeMessage(String parentDoc,String subDoc,String docId,bool val){
+    service.likeMessage(parentDoc, subDoc, docId,val);
   }
 }

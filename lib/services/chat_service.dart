@@ -17,4 +17,13 @@ class ChatService{
     var url = (await snapshot.ref.getDownloadURL()).toString();
     return url;
   }
+  
+  likeMessage(String parentDoc,String subDoc,String docId,bool value){
+    FirebaseFirestore.instance.collection('chats').doc(parentDoc).collection(subDoc).doc(docId).update({
+      'isFavorite': value,
+    });
+    FirebaseFirestore.instance.collection('chats').doc(subDoc).collection(parentDoc).doc(docId).update({
+      'isFavorite': value,
+    });
+  }
 }

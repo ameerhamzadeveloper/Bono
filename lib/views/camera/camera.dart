@@ -1,10 +1,8 @@
-import 'dart:math';
+import 'dart:typed_data';
 import 'package:bono_gifts/provider/feeds_provider.dart';
-import 'package:bono_gifts/views/camera/camera_view.dart';
-import 'package:bono_gifts/views/camera/video_view.dart';
+import 'package:bono_gifts/views/camera/uint8_image.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 
@@ -17,11 +15,11 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
 
-
   @override
   void initState() {
     super.initState();
     Provider.of<FeedsProvider>(context,listen: false).getCamera();
+    Provider.of<FeedsProvider>(context,listen: false).getPhotoGAllery();
   }
   @override
   void dispose() {
@@ -51,11 +49,48 @@ class _CameraScreenState extends State<CameraScreen> {
           Positioned(
             bottom: 0.0,
             child: Container(
-              color: Colors.black,
+              // color: Colors.black,
               padding: const EdgeInsets.only(top: 5, bottom: 5),
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
+                  SizedBox(
+                    height: 50,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: pro.imageList.length,
+                      itemBuilder: (ctx,i){
+                        return FutureBuilder<Uint8List?>(
+                        future: pro.imageList[i].thumbDataWithSize(300, 300),
+                        builder: (BuildContext context, snapshot) {
+                          // Uint8List bytes = snapshot.data;
+                          print(snapshot);
+                        if (snapshot.connectionState == ConnectionState.done) {
+                              return InkWell(
+                                onTap: (){
+                                  print(snapshot.data![i]);
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => Uint8ViewPage(bytes: snapshot.data!,)
+                                  ));
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Image.memory(
+                                    snapshot.data!,
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              );
+                            }
+                            return Container();
+                          },
+                          );
+                      },
+                    ),
+                  ),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

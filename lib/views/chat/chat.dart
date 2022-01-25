@@ -13,6 +13,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+
 class Chat extends StatefulWidget {
   @override
   _ChatState createState() => _ChatState();
