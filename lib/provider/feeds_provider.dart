@@ -156,6 +156,11 @@ class FeedsProvider extends ChangeNotifier{
 
   }
 
+  openDescription(int i){
+    feeds[i].isDesOpen = !feeds[i].isDesOpen;
+    notifyListeners();
+  }
+
   getFeedsPosts(){
     service.getFeedsPosts().then((value){
       for(var fed in value.docs){

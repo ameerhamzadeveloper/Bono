@@ -140,25 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ],
                     ),
                     Row(children:[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                          children: const [
-                            Icon(Icons.motorcycle_rounded),
-                            Text("35 min")
-                          ],
-                    ),
-
-                        ],
-                      ),
-                      SizedBox(width: 10,),
-                    Column(
-                      children: [
-                        const Icon(Icons.more_horiz),
-                        Image.asset("assets/images/icons/product_icon.png",height: 20,width: 20,)
-                      ],
-                     ),
+                    Image.asset("assets/images/icons/product_icon.png",height: 25,width: 25,),
                    ],
                   ),
                 ],

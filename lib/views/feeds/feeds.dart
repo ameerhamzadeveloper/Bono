@@ -99,6 +99,7 @@ class _FeedsState extends State<Feeds> {
                                 pro.feeds[i].date.toString(),
                                 style: TextStyle(color: Colors.black,fontSize: 12),
                               ),
+
                             ],
                           ),
                         ),
@@ -110,25 +111,37 @@ class _FeedsState extends State<Feeds> {
                           children: [
                             SizedBox(width: MediaQuery.of(context).size.width / 3,),
                             Expanded(child: Text(pro.feeds[i].title)),
-                            TextButton(onPressed: (){}, child: Text("Read More"))
+                            TextButton(onPressed: (){pro.openDescription(i);}, child: Text(pro.feeds[i].isDesOpen ? "Read Less":"Read More"))
                           ],
                         ),
+                        pro.feeds[i].isDesOpen ? Text(
+                          pro.feeds[i].description.toString(),
+                          style: TextStyle(color: Colors.black,fontSize: 12),
+                        ):Container(),
+                        SizedBox(height: 5,),
                         Stack(
                           children: [
                             Image.network(pro.feeds[i].image,width: getWidth(context),fit: BoxFit.cover,),
-                            Align(
-                              alignment: Alignment.centerRight,
+                            Positioned(
+                              bottom:0,
+                              right:0,
+                              // alignment: Alignment.bottomRight,
                               child: Container(
-                                color:Colors.black.withOpacity(0.2),
+                                // color:Colors.black.withOpacity(0.2),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     const SizedBox(height: 10,),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: InkWell(
                                         onTap: (){},
-                                        child: Image.asset(sharedIcon,height: 30,width: 30,),
+                                        child: Column(
+                                          children: [
+                                            Image.asset(sharedIcon,height: 40,width: 40,),
+                                            Text("0",style: TextStyle(color: Colors.white),)
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     Padding(
@@ -247,19 +260,34 @@ class _FeedsState extends State<Feeds> {
                                           );
                                         });
                                       },
-                                      child:  Image.asset(commentIcon,height: 30,width: 30,)),
+                                      child:  Column(
+                                        children: [
+                                          Image.asset(commentIcon,height: 40,width: 40,),
+                                          Text("0",style: TextStyle(color: Colors.white),)
+                                        ],
+                                      )),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: InkWell(onTap: (){
                                         Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: pro.feeds[i].profileName,profileImage: pro.feeds[i].profileImage,recieverPhone:pro.feeds[i].phone)));
-                                      }, child:  Image.asset(chatIconNew,height: 30,width: 30,),),
+                                      }, child:  Column(
+                                        children: [
+                                          Image.asset(chatIconNew,height: 40,width: 40,),
+                                          Text("0",style: TextStyle(color: Colors.white),)
+                                        ],
+                                      ),),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: InkWell(
                                         onTap: (){},
-                                        child: Image.asset(giftICon,height: 30,width: 30,),
+                                        child: Column(
+                                          children: [
+                                            Image.asset(giftICon,height: 40,width: 40,),
+                                            Text("0",style: TextStyle(color: Colors.white),)
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],

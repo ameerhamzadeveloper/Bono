@@ -215,7 +215,9 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    getContacts();
+   Future.delayed(Duration(seconds: 2),(){
+     getContacts();
+   });
 
   }
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -303,29 +305,15 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                             ));
                           },
                           child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(top: BorderSide(color: Colors.grey),bottom: data.length == data.length ? BorderSide(color: Colors.grey):BorderSide.none)
+                            decoration: const BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Colors.grey))
                             ),
                             child: Slidable(
-                              // Specify a key if the Slidable is dismissible.
                               key: const ValueKey(0),
-
-                              startActionPane: ActionPane(
-                                motion: const ScrollMotion(),
-
-                                dismissible: DismissiblePane(onDismissed: () {}),
-
-                                children:  [
-
-                                ],
-                              ),
-
-                              // The end action pane is the one at the right or the bottom side.
                               endActionPane: ActionPane(
                                 motion: ScrollMotion(),
                                 children: [
                                   SlidableAction(
-                                    // An action can be bigger than the others.
                                     flex: 2,
                                     onPressed: (c){
                                       print(data['isSeen']);
@@ -344,9 +332,6 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                   ),
                                 ],
                               ),
-
-                              // The child of the Slidable is what the user sees when the
-                              // component is not dragged.
                               child: ListTile(
                                 // leading: HexagonWidget.flat(
                                 //   width: 20,
@@ -356,33 +341,34 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                 //   child: Text("io"),
                                 // ),
                                   leading: CircleAvatar(
+                                    radius: 25,
                                     backgroundImage: NetworkImage(data['profileImage']),
                                   ),
                                   subtitle: data['messageType'] == 'image' ? Row(
-                                    children: [
+                                    children: const [
                                       Icon(Icons.insert_photo_rounded,color: Colors.grey,),
-                                      Text("Image")
+                                      Text("Image"),
                                     ],
-                                  ):Text(data['lastMessage'].toString().length > 10 ?  "${data['lastMessage'].toString().substring(0,10)}..." : data['lastMessage']),
+                                  ):Text(data['lastMessage'].toString().length > 35 ?  "${data['lastMessage'].toString().substring(0,35)}..." : data['lastMessage']),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(data['date']),
+                                      Text(data['date'],style:const TextStyle(fontSize: 12,color: Colors.grey),),
                                       const SizedBox(height: 4,),
                                       CircleAvatar(
                                         backgroundColor: Colors.white,
                                         radius: 10,
                                         child: Center(child: data['isSendMe'] == true ? data['isSeen'] == true ? Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
+                                          children: const [
                                             Icon(Icons.check,size: 10,),
                                             Icon(Icons.check,size: 10,),
                                           ],
                                         ): Icon(Icons.check,size: 10,): Text(data['count'],style: TextStyle(fontSize: 9),)),
-                                      )
+                                      ),
                                     ],
                                   ),
-                                  title: Text(data['recieverName'])),
+                                  title: Text(data['recieverName'],style: TextStyle(fontWeight: FontWeight.w500),)),
                             ),
                           ),
                         );}).toList(),
@@ -394,7 +380,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(height: getHeight(context) / 5,),
-                          Text("Invite your friends",style: TextStyle(fontSize: 22),),
+                          const Text("Invite your friends",style: TextStyle(fontSize: 22),),
                           SizedBox(height:20),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal:15.0),
@@ -606,10 +592,6 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                     ],
                                   ),
                                 ),
-                                actions: [
-                                  CupertinoButton(child: Text("Back"), onPressed: ()=> Navigator.pop(context)),
-                                  CupertinoButton(child: Text("Move"), onPressed: ()=> Navigator.pop(context)),
-                                ],
                               );
                             }
                           );
@@ -671,6 +653,16 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     );
                   },
                 ),
+              alPhabat("Family"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("No Connect"),
+              ),
+              alPhabat("Work"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("No Connect"),
+              ),
               ],
             ):
             SingleChildScrollView(
@@ -754,8 +746,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                 Row(
                   children: [
                     const CircleAvatar(
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person),
+                      backgroundImage: NetworkImage("https://firebasestorage.googleapis.com/v0/b/bonogifts.appspot.com/o/profile.png?alt=media&token=dec6afee-44f3-4876-8f2b-dbb2be0dd4d8"),
                     ),
                     SizedBox(width: 10,),
                     Column(
@@ -796,7 +787,7 @@ Widget alPhabat(String name){
     padding: const EdgeInsets.all(8),
     // height: 20,
     width: double.infinity,
-    color: Colors.white,
+    color: Colors.grey[300],
     child:  Center(child: Text(name,style: const TextStyle(color: Colors.blue ,fontSize: 18,fontWeight: FontWeight.w500),)),
   );
 }

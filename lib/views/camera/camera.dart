@@ -24,7 +24,10 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     super.dispose();
-    Provider.of<FeedsProvider>(context,listen: false).dispostCameraController();
+    Future.delayed(const Duration(seconds: 4),(){
+      Provider.of<FeedsProvider>(context,listen: false).dispostCameraController();
+    });
+
   }
   @override
   Widget build(BuildContext context) {
