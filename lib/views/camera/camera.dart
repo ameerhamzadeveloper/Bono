@@ -81,8 +81,8 @@ class _CameraScreenState extends State<CameraScreen> {
                                   padding: const EdgeInsets.all(2.0),
                                   child: Image.memory(
                                     snapshot.data!,
-                                    height: 50,
-                                    width: 50,
+                                    height: 80,
+                                    width: 60,
                                     fit: BoxFit.fill,
                                   ),
                                 ),

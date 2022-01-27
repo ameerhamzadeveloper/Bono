@@ -64,6 +64,8 @@ dependencies:
 
 #  audio
   audioplayers: ^0.20.1
+  flutter_sound: ^8.5.0
+  flutter_ffmpeg: ^0.4.2
 
 #  state
   provider: ^6.0.2

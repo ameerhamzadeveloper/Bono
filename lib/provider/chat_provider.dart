@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bono_gifts/models/contact_model.dart';
+import 'package:bono_gifts/models/move_list_model.dart';
 import 'package:bono_gifts/models/network_cat_model.dart';
 import 'package:bono_gifts/models/network_model.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
@@ -10,13 +11,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 class ChatProvider extends ChangeNotifier {
+
+  List<int> networkCatList = [0, 1, 2, 3, 4, 5];
   List<String> phones = [];
   List<String> contactList = [];
+
+  List<NewtWorkModel> friendsList = [];
+  List<NewtWorkModel> familyList = [];
+  List<NewtWorkModel> workList = [];
+  List<NewtWorkModel> neghiborList = [];
+  List<NewtWorkModel> schoolList = [];
+  List<NewtWorkModel> othersList = [];
+
+
+  List<NewtWorkModel> moveList = [];
+
   List<String> newList = [];
   List<ContModel> nameCont = [];
-  List<NewtWorkModel> moveList = [];
+  List<MoveListModel> moveListt = [];
 
   AudioCache audio = AudioCache(fixedPlayer: AudioPlayer());
 
@@ -25,6 +40,23 @@ class ChatProvider extends ChangeNotifier {
   }
   playRecieveMessage(){
     audio.play("receive.wav");
+  }
+
+  addinMoveList(MoveListModel item, bool isChecked){
+
+    if(isChecked) {
+      for (var i = 0; i < moveListt.length; i++) {
+        if (moveListt[i].phone.contains(item.phone)) {
+          moveListt.removeAt(i);
+        }
+      }
+      notifyListeners();
+    } else {
+      moveListt.add(item);
+      notifyListeners();
+    }
+    notifyListeners();
+    print("move list ${moveListt.length}");
   }
 
 
@@ -59,24 +91,32 @@ class ChatProvider extends ChangeNotifier {
     matchList.add(chat);
   }
 
-  checkBoxSelect(int i){
-    makeNetWorkSelect(i);
-    if(netWorkLsit[i].isSelect == true){
+  checkBoxSelect(int i,List<dynamic> list){
+    list[i].isSelect = !list[i].isSelect;
+    notifyListeners();
+  }
+  shareBono(){
+    Share.share("Hi, Iam using Bono messaging app. it let's you surprise your friends with real gifts!. Let's chat there :)....,click the link below to download it\n www.gitbono.com");
+  }
 
-        moveList.add(NewtWorkModel(
-            name: netWorkLsit[i].name,
-            phone: netWorkLsit[i].phone,
-            photo: netWorkLsit[i].photo,
-            isSelect: netWorkLsit[i].isSelect));
-
-    }else{
-
+  moveNetWorkInFirebase(BuildContext context,int status){
+    friendsList = [];
+    familyList = [];
+    workList = [];
+    neghiborList = [];
+    schoolList = [];
+    othersList = [];
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    for(var i = 0; i < moveListt.length;i++){
+      service.moveNetworks(pro.phone!, moveListt[i].phone, status).then((value){
+        getContacts(context);
+      });
     }
   }
 
   List matchList = [];
 
-  void getContacts() async {
+  void getContacts(BuildContext context) async {
     contactList.clear();
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts = await FlutterContacts.getContacts();
@@ -92,9 +132,13 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     Future.delayed(const Duration(seconds: 2), () {
-      fetchNewtrork();
+      fetchNewtrork(context);
     });
     notifyListeners();
+  }
+
+  addinMatchList(String char){
+    matchList.add(char);
   }
 
   List<NewtWorkModel> netWorkLsit = [];
@@ -111,7 +155,7 @@ class ChatProvider extends ChangeNotifier {
     NetCatMo(name: 'Others', isSel: false),
   ];
 
-  fetchNewtrork() {
+  fetchNewtrork(BuildContext context) {
     print(contactList);
     // .where('searchPhone',isLessThanOrEqualTo: contactList[i]).where('searchPhone1',isEqualTo: contactList[i])
     for (var i = 0; i < contactList.length; i++) {
@@ -146,8 +190,59 @@ class ChatProvider extends ChangeNotifier {
         }
       });
     }
+    Future.delayed(const Duration(seconds: 2),(){addContactToFirebase(context);});
     notifyListeners();
   }
+
+
+  addContactToFirebase(BuildContext context){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    for(var d in netWorkLsit){
+      service.fetchExistingMatchContacts(d.phone,pro.phone!).then((value){
+        if(!value.exists){
+          service.saveContactsToFirebase(pro.phone!,{'imageUrl':d.photo,'phone':d.phone,'name':d.name,},d.phone).then((value){
+            print("added");
+          });
+        }
+      });
+    }
+    // Future.delayed(const Duration(seconds: 2),(){getContactsFromFirebase(context);});
+  }
+
+  getContactsFromFirebase(BuildContext context){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    for(var d =0;d < networkCatList.length;d++){
+      service.getContactsFromFirebase(pro.phone!, d).then((value){
+        for(var dd in value.docs){
+          switch(dd['status']){
+            case 0:
+              friendsList.add(NewtWorkModel(phone: dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              notifyListeners();
+              break;
+            case 1:
+              familyList.add(NewtWorkModel(phone: dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              break;
+            case 2:
+              workList.add(NewtWorkModel(phone: dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              break;
+            case 3:
+              schoolList.add(NewtWorkModel(phone:dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              break;
+            case 4:
+              neghiborList.add(NewtWorkModel(phone: dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              break;
+            case 5:
+              othersList.add(NewtWorkModel(phone: dd['phone'],photo: dd['imageUrl'],isSelect: false,name: dd['name']));
+              break;
+          }
+          notifyListeners();
+        }
+      });
+      notifyListeners();
+    }
+
+  }
+
   DateTime date = DateTime.now();
 
   String docId = '';
@@ -224,6 +319,8 @@ class ChatProvider extends ChangeNotifier {
     playSendMusic();
   }
 
+
+
   sendImageMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
     final pro = Provider.of<SignUpProvider>(context,listen: false);
     firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).doc(docId).set({
@@ -284,6 +381,71 @@ class ChatProvider extends ChangeNotifier {
       'isSeen':false,
       'isOnline':true,
       'messageType': 'image',
+      // 'token':widget.fcmToken,
+    });
+    playSendMusic();
+  }
+
+  sendVoiceMessage(BuildContext context,message,String recieverPhone,String messageCount,String recieverName,String profileImage){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    firestore.collection('chats').doc(pro.phone.toString()).collection(recieverPhone).doc(docId).set({
+      'message':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'voice',
+      'isFavorite':false,
+      'id':docId,
+    });
+    firestore.collection('chats').doc(recieverPhone).collection(pro.phone.toString()).doc(docId).set({
+      'message':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'voice',
+      'isFavorite':false,
+      'id':docId,
+    });
+    firestore.collection('recentChats').doc(recieverPhone).collection('myChats').doc(pro.phone).set({
+      'lastMessage':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':pro.name,
+      'profileImage':pro.userImage,
+      'count':messageCount,
+      'isSendMe':false,
+      'isSeen':false,
+      'isOnline':false,
+      'messageType': 'voice',
+      // 'token': widget.fcmToken,
+    });
+    firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').doc(recieverPhone).set({
+      'lastMessage':message,
+      'date': "${date.year}/${date.month}/${date.day}",
+      'timestamp':DateTime.now(),
+      'recieverID':recieverPhone,
+      'senderID':pro.phone,
+      'recieverName':recieverName,
+      'profileImage':profileImage,
+      'count':messageCount,
+      'isSendMe':true,
+      'isSeen':false,
+      'isOnline':true,
+      'messageType': 'voice',
       // 'token':widget.fcmToken,
     });
     playSendMusic();

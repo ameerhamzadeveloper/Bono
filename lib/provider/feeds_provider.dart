@@ -111,7 +111,7 @@ class FeedsProvider extends ChangeNotifier{
   }
 
   getImage()async{
-    XFile? tempImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? tempImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 70,maxHeight: 200,maxWidth: 200);
     image = tempImage;
     bytesImage = await image!.readAsBytes();
     notifyListeners();
@@ -149,7 +149,7 @@ class FeedsProvider extends ChangeNotifier{
     };
     service.savePost(data).then((value) {
       if(value){
-
+        getFeedsPosts();
         Navigator.pop(context);
       }
     });

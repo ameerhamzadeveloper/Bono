@@ -85,18 +85,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ) : Container(),
                 const SizedBox(height: 5,),
-          StaggeredGrid.count(
-              crossAxisCount: 3,
-              // mainAxisSpacing: 2,
-              // crossAxisSpacing: 2,
-              children: pro.myPosts.map((e){
-                print("countttttt $e");
-                return Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Image.network(e),
-                );
-              }).toList()
-          ),
+                GridView.builder(
+                  itemCount: pro.myPosts.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate:
+                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 8.0,
+                    childAspectRatio: 0.6,
+                    maxCrossAxisExtent: 100,
+                  ),
+                  itemBuilder: (ctx,i){
+                    return Image.network(pro.myPosts[i]);
+                  },
+                )
               ],
             ),
           ),

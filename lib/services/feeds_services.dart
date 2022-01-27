@@ -15,6 +15,8 @@ class FeedsService{
         'title': map['title'],
         'des': map['des'],
         'image url': url,
+        'like':0,
+        'share':0,
         'timestamp': DateTime.now(),
         'phone':map['phone'],
         'profileImage': map['profileImage'],

@@ -50,6 +50,7 @@ class _PhoneAuthenticationState extends State<PhoneAuthentication> {
                       ),
                       Expanded(
                         child: TextFormField(
+                          keyboardType: TextInputType.phone,
                           validator: (val){
                             if(val!.isEmpty){
                               return "Please Enter your phone";

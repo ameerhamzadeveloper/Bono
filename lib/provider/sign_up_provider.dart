@@ -58,7 +58,10 @@ class SignUpProvider extends ChangeNotifier {
   setBuild(String sBuild)=> buildingName = TextEditingController(text:sBuild);
   setArea(String sArea)=> area = TextEditingController(text:sArea);
   setStreet(String sStreet)=> street = TextEditingController(text:sStreet);
-  setPhoneNum(String phone)=> phoneNumber = TextEditingController(text: phone);
+  setPhoneNum(String phone){
+    phoneNumber = TextEditingController(text: phone);
+    phone = '$dailCode$phone';
+  }
   setName(String namee)=> name = namee;
   setEmail(String emaill)=> email = emaill;
 
@@ -140,7 +143,7 @@ class SignUpProvider extends ChangeNotifier {
   String? diffDays;
 
   getUser()async{
-    await service.getUser(phoneNumber.text).then((data){
+    await service.getUser(phone!).then((data){
 
       phoneNumber = TextEditingController(text:data['phone']);
       name = data['name'];
@@ -251,7 +254,7 @@ class SignUpProvider extends ChangeNotifier {
   getMyPhoto(){
     service.getMyPhotoy(phone!).then((value){
       for(var i in value.docs){
-
+        print("docs my post $i");
         myPosts.add(i['image url']);
       }
       notifyListeners();

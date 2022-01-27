@@ -30,24 +30,24 @@ class _FeedsState extends State<Feeds> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RotatedBox(
-                    quarterTurns: 4,
+                  RotationTransition(
+                    turns:  const AlwaysStoppedAnimation(15 / -180),
                     child: Image.asset(butteryFly,height: 30,),
                   ),
-                  RotatedBox(
-                    quarterTurns: 4,
+                  RotationTransition(
+                    turns:  const AlwaysStoppedAnimation(15 / -180),
                     child: Image.asset(butteryFly,height: 50,),
                   ),
                   RotatedBox(
                     quarterTurns: 4,
                     child: Image.asset(logo,height: 80,),
                   ),
-                  RotatedBox(
-                    quarterTurns: 4,
+                  RotationTransition(
+                    turns:  const AlwaysStoppedAnimation(15 / 320),
                     child: Image.asset(butteryFly,height: 50,),
                   ),
-                  RotatedBox(
-                    quarterTurns: 4,
+                  RotationTransition(
+                    turns: const  AlwaysStoppedAnimation(15 / 320),
                     child: Image.asset(butteryFly,height: 30,),
                   ),
                 ],
