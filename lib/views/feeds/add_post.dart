@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/feeds_provider.dart';
+import 'package:bono_gifts/views/camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 class AddPost extends StatefulWidget {
@@ -90,8 +91,10 @@ class _AddPostState extends State<AddPost> {
                     ),
                   ),
                   const SizedBox(height: 20,),
-                  pro.image == null ? InkWell(
-                    onTap: ()=>pro.getImage(),
+                  pro.bytesImage == null ? InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CameraScreen()));
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       color: Colors.blue,
@@ -107,7 +110,7 @@ class _AddPostState extends State<AddPost> {
                         ],
                       ),
                     ),
-                  ):Image.file(File(pro.image!.path),height: 220,fit: BoxFit.cover,width: double.infinity,),
+                  ):Image.memory(pro.bytesImage!,height: 220,fit: BoxFit.cover,width: double.infinity,),
                   Text(photoErro,style: TextStyle(color: Colors.red),),
                   const SizedBox(height: 20,),
                   Row(

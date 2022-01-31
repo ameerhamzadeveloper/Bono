@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 
 class FeedsService{
 
-  Future<bool> savePost(Map<String,dynamic> map) async {
+  Future<bool> savePost(Map<String,dynamic> map,String randVal) async {
     final CollectionReference ref = FirebaseFirestore.instance.collection('userPosts');
     // final CollectionReference comRef = FirebaseFirestore.instance.collection('userPosts').doc(map['phone']).collection('comments');
-      var snapshot = await FirebaseStorage.instance.ref().child('Posts Pictures/${map['phone']}').putData(map['image']);
+      var snapshot = await FirebaseStorage.instance.ref().child('Posts Pictures').child('${map['phone']}/$randVal').putData(map['image']);
       var url = (await snapshot.ref.getDownloadURL()).toString();
       var userData = {
         'title': map['title'],
@@ -25,13 +25,11 @@ class FeedsService{
       await ref.add(userData).then((value){
         print("Posted");
       });
-
-
     return true;
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getFeedsPosts()async{
-    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').limit(10).get();
+    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').orderBy('timestamp').limit(50).get();
     return data;
   }
   
@@ -43,5 +41,40 @@ class FeedsService{
       'text': text,
     });
   }
+
+  Future<bool> getLikePost(String userDoc,String postDoc)async{
+    bool val = false;
+    await FirebaseFirestore.instance.collection('users').doc(userDoc).collection('likedPosts').doc(postDoc).get().then((value){
+      print("like post valeu $value");
+      if(value.exists){
+        val = true;
+      }else{
+        val = false;
+      }
+    });
+    return val;
+  }
+
+  addLike(String docRed,int like,String userDoc){
+    FirebaseFirestore.instance.collection('users').doc(userDoc).collection('likedPosts').doc(docRed).get().then((value){
+      if(value.exists){
+        FirebaseFirestore.instance.collection('userPosts').doc(docRed).update({
+          'like':like == 0 ? 0 : like-1
+        });
+        FirebaseFirestore.instance.collection('users').doc(userDoc).collection('likedPosts').doc(docRed).delete();
+        print("Exist");
+
+      }else{
+        print("Exist Not");
+        FirebaseFirestore.instance.collection('userPosts').doc(docRed).update({
+          'like':like+1
+        });
+        FirebaseFirestore.instance.collection('users').doc(userDoc).collection('likedPosts').doc(docRed).set({
+          'id':docRed,
+        });
+      }
+    });
+  }
+
 
 }

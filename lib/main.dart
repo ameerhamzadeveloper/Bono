@@ -1,3 +1,4 @@
+import 'package:bono_gifts/provider/buy_provider.dart';
 import 'package:bono_gifts/provider/chat_provider.dart';
 import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
@@ -27,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<ChatProvider>(
           create: (context) => ChatProvider(),
+        ),
+        ChangeNotifierProvider<BuyProvider>(
+          create: (context) => BuyProvider(),
         ),
       ],
       child: MaterialApp(

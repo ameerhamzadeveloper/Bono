@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 class FeedsProvider extends ChangeNotifier{
   XFile? image;
@@ -88,11 +89,14 @@ class FeedsProvider extends ChangeNotifier{
 
   void takePhoto(BuildContext context) async {
     XFile file = await _cameraController.takePicture();
+    bytesImage = await file.readAsBytes();
+    // bytesImage = x;
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (builder) => CameraViewPage(
               path: file.path,
+              bytes: bytesImage!,
             )));
   }
 
@@ -114,6 +118,11 @@ class FeedsProvider extends ChangeNotifier{
     XFile? tempImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 70,maxHeight: 200,maxWidth: 200);
     image = tempImage;
     bytesImage = await image!.readAsBytes();
+    notifyListeners();
+  }
+
+  assignImage(Uint8List image){
+    bytesImage = image;
     notifyListeners();
   }
 
@@ -147,9 +156,9 @@ class FeedsProvider extends ChangeNotifier{
       'profileImage': pro.userImage,
       'profileName':pro.name,
     };
-    service.savePost(data).then((value) {
+    service.savePost(data,generateRandomString(20)).then((value) {
       if(value){
-        getFeedsPosts();
+        getFeedsPosts(context);
         Navigator.pop(context);
       }
     });
@@ -161,15 +170,30 @@ class FeedsProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  getFeedsPosts(){
-    service.getFeedsPosts().then((value){
+  Future<void> getFeedsPosts(BuildContext context)async{
+    feeds.clear();
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    await service.getFeedsPosts().then((value){
       for(var fed in value.docs){
         feeds.add(FeedsModels(image: fed['image url'], description: fed['des'],
             title: fed['title'], date: fed['timestamp'].toDate(),
             profileImage: fed['profileImage'],profileName: fed['profileName'],
           isDesOpen: false,phone: fed['phone'],docid: fed.id,
+          like: fed['like'],
+          share: fed['share'],
+          isLiked: false,
          ),
         );
+        notifyListeners();
+      }
+      for(var f = 0; f < feeds.length;f++){
+        service.getLikePost(pro.phone!, feeds[f].docid).then((value) {
+          if(value == true){
+            feeds[f].isLiked = true;
+          }else{
+            feeds[f].isLiked = false;
+          }
+        });
         notifyListeners();
       }
     });
@@ -180,6 +204,25 @@ class FeedsProvider extends ChangeNotifier{
     commnetController.clear();
   }
 
+  incrementLike(int i){
+    if(feeds[i].isLiked == true){
+      print("like");
+      feeds[i].like = feeds[i].like - 1;
+      print(feeds[i].like);
+      notifyListeners();
+    }else{
+      print("dlike");
+      feeds[i].like = feeds[i].like + 1;
+      print(feeds[i].like);
+      notifyListeners();
+    }
+    notifyListeners();
+  }
+
+  sharePost(String title,String image){
+    Share.share("Post From Bono\n$title,\n$image");
+  }
+
 
   setCommentText(String val){
     commnetController = TextEditingController(text: val);
@@ -187,6 +230,7 @@ class FeedsProvider extends ChangeNotifier{
 
 
   List<AssetEntity> imageList = [];
+
 
   getPhotoGAllery()async{
     var result = await PhotoManager.requestPermissionExtend();
@@ -201,6 +245,49 @@ class FeedsProvider extends ChangeNotifier{
       /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
     }
   }
+  callGetLike(BuildContext context,String postDoc){
+    getLikeButton(context,postDoc);
+  }
+  static String imagee = "assets/feeds_icons/like-icon.png";
+   String getLikeButton(BuildContext context,String postDoc){
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    // late String x;
+     service.getLikePost(pro.phone!, postDoc).then((value){
+      if(value == true){
+        print("trueee caledd");
+         LikeClass.likeBtn = "assets/feeds_icons/like-icon.png";
+      }else{
+        print("falseeeeeee caledd");
+        LikeClass.likeBtn = "assets/feeds_icons/like-icon-grey-.png";
+      }
+    });
+     print(LikeClass.likeBtn);
+     Future.delayed(Duration(seconds: 1));
+     return LikeClass.likeBtn;
+    // print("nothing calledd");
+  }
+  addLike(String docRed,int like,BuildContext context, int index){
+     feeds[index].isLiked = !feeds[index].isLiked;
+    final pro = Provider.of<SignUpProvider>(context,listen: false);
+    service.addLike(docRed, like,pro.phone!);
+    notifyListeners();
+  }
+
+  int like = 0;
+
+    getLikeCount(String docId)async{
+
+    await FirebaseFirestore.instance.collection('userPosts').doc(docId).get().then((event) {
+       like = event.data()!['like'];
+       print("likeeeeeeeee $like");
+    });
+    // return "0";
+    notifyListeners();
+
+  }
 
 
+}
+class LikeClass{
+  static String likeBtn = 'assets/feeds_icons/like-icon-grey-.png';
 }

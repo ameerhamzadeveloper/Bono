@@ -179,14 +179,13 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
    Future.delayed(Duration(seconds: 4),(){
      proChat.getContactsFromFirebase(context);
     });
-
   }
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     final pro = Provider.of<SignUpProvider>(context);
     final proChat = Provider.of<ChatProvider>(context);
-    final Stream<QuerySnapshot> documentStream = firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').orderBy('timestamp').snapshots();
+    final Stream<QuerySnapshot> documentStream = firestore.collection('recentChats').doc(pro.phone.toString()).collection('myChats').orderBy('timestamp',descending: true).snapshots();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -254,6 +253,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     return Center(child: Text("No Message"),);
                   }else if(snapshot.data!.docs.length > 0){
                     return ListView(
+                      physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: snapshot.data!.docs.map((DocumentSnapshot document) {
                         Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
@@ -311,7 +311,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                                       Icon(Icons.insert_photo_rounded,color: Colors.grey,),
                                       Text("Image"),
                                     ],
-                                  ):Text(data['lastMessage'].toString().length > 35 ?  "${data['lastMessage'].toString().substring(0,35)}..." : data['lastMessage']),
+                                  ):Text(data['lastMessage'].toString().length > 25 ?  "${data['lastMessage'].toString().substring(0,25)}..." : data['lastMessage']),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -365,16 +365,30 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
             ): _tabController.index == 1 ?  Column(
 
             children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(networkCat.length, (index){
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(networkCat[index].name),
-                      );
-                    }),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 45,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey)
+                    ),
+                    padding: const EdgeInsets.only(left:8),
+                    child:  Center(
+                      child: TextField(
+                        onChanged: (val){
+                          proChat.searchNetwork(val);
+                          if(val.isEmpty){
+                            proChat.getContactsFromFirebase(context);
+                          }
+                        },
+                      decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Search for networks",
+                      suffixIcon: IconButton(onPressed: (){proChat.getContactsFromFirebase(context);}, icon: const Icon(Icons.clear))
+                      ),
+                    ),
+                    )),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -547,20 +561,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(proChat.friendsList[i].photo),
-                              ),
-                              SizedBox(width: 10,),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(proChat.friendsList[i].name,style: TextStyle(fontSize: 18),),
-                                  Text(proChat.friendsList[i].phone),
-                                ],
-                              ),
-                            ],
+                          InkWell(
+                            onTap:(){
+                              Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => ChatScreen(
+                                      recieverName: proChat.friendsList[i].name,
+                                      profileImage: proChat.friendsList[i].photo,
+                                      recieverPhone: proChat.friendsList[i].phone,
+                                  ),
+                               ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(proChat.friendsList[i].photo),
+                                ),
+                                SizedBox(width: 10,),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(proChat.friendsList[i].name,style: TextStyle(fontSize: 18),),
+                                    Text(proChat.friendsList[i].phone),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                           Checkbox(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -591,20 +617,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(proChat.familyList[i].photo),
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                recieverName: proChat.familyList[i].name,
+                                profileImage: proChat.familyList[i].photo,
+                                recieverPhone: proChat.familyList[i].phone,
+                              ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proChat.familyList[i].name,style: TextStyle(fontSize: 18),),
-                                Text(proChat.familyList[i].phone),
-                              ],
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(proChat.familyList[i].photo),
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(proChat.familyList[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(proChat.familyList[i].phone),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Checkbox(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -635,20 +673,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(proChat.workList[i].photo),
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                recieverName: proChat.workList[i].name,
+                                profileImage: proChat.workList[i].photo,
+                                recieverPhone: proChat.workList[i].phone,
+                              ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proChat.workList[i].name,style: TextStyle(fontSize: 18),),
-                                Text(proChat.workList[i].phone),
-                              ],
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(proChat.workList[i].photo),
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(proChat.workList[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(proChat.workList[i].phone),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Checkbox(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -679,20 +729,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(proChat.schoolList[i].photo),
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                recieverName: proChat.schoolList[i].name,
+                                profileImage: proChat.schoolList[i].photo,
+                                recieverPhone: proChat.schoolList[i].phone,
+                              ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proChat.schoolList[i].name,style: TextStyle(fontSize: 18),),
-                                Text(proChat.schoolList[i].phone),
-                              ],
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(proChat.schoolList[i].photo),
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(proChat.schoolList[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(proChat.schoolList[i].phone),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Checkbox(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -723,20 +785,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(proChat.neghiborList[i].photo),
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                recieverName: proChat.neghiborList[i].name,
+                                profileImage: proChat.neghiborList[i].photo,
+                                recieverPhone: proChat.neghiborList[i].phone,
+                              ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proChat.neghiborList[i].name,style: TextStyle(fontSize: 18),),
-                                Text(proChat.neghiborList[i].phone),
-                              ],
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(proChat.neghiborList[i].photo),
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(proChat.neghiborList[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(proChat.neghiborList[i].phone),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Checkbox(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -759,7 +833,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
               alPhabat("Others"),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: proChat.othersList.length,
                 itemBuilder: (contxt,i){
                   return Padding(
@@ -767,20 +841,32 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(proChat.othersList[i].photo),
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                recieverName: proChat.othersList[i].name,
+                                profileImage: proChat.othersList[i].photo,
+                                recieverPhone: proChat.othersList[i].phone,
+                              ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(proChat.othersList[i].name,style: TextStyle(fontSize: 18),),
-                                Text(proChat.othersList[i].phone),
-                              ],
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(proChat.othersList[i].photo),
+                              ),
+                              SizedBox(width: 10,),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(proChat.othersList[i].name,style: TextStyle(fontSize: 18),),
+                                  Text(proChat.othersList[i].phone),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Checkbox(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -806,57 +892,57 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
             SingleChildScrollView(
               child: Column(
                 children: [
-                  matchList.contains('a') ? alPhabat('A') :Container(),
+                  proChat.matchList.contains('a') ? alPhabat('A') :Container(),
                   getConList('a',proChat),
-                  matchList.contains('b') ? alPhabat('B') :Container(),
+                  proChat.matchList.contains('b') ? alPhabat('B') :Container(),
                   getConList('b',proChat),
-                  matchList.contains('c') ? alPhabat('C') :Container(),
+                  proChat.matchList.contains('c') ? alPhabat('C') :Container(),
                   getConList('c',proChat),
-                  matchList.contains('d') ? alPhabat('D') :Container(),
+                  proChat.matchList.contains('d') ? alPhabat('D') :Container(),
                   getConList('d',proChat),
-                  matchList.contains('e') ? alPhabat('E') :Container(),
+                  proChat.matchList.contains('e') ? alPhabat('E') :Container(),
                   getConList('e',proChat),
-                  matchList.contains('f') ? alPhabat('F') :Container(),
+                  proChat.matchList.contains('f') ? alPhabat('F') :Container(),
                   getConList('f',proChat),
-                  matchList.contains('g') ? alPhabat('G') :Container(),
+                  proChat.matchList.contains('g') ? alPhabat('G') :Container(),
                   getConList('g',proChat),
-                  matchList.contains('h') ? alPhabat('H') :Container(),
+                  proChat.matchList.contains('h') ? alPhabat('H') :Container(),
                   getConList('h',proChat),
-                  matchList.contains('i') ? alPhabat('I') :Container(),
+                  proChat.matchList.contains('i') ? alPhabat('I') :Container(),
                   getConList('i',proChat),
-                  matchList.contains('j') ? alPhabat('J') :Container(),
+                  proChat.matchList.contains('j') ? alPhabat('J') :Container(),
                   getConList('j',proChat),
-                  matchList.contains('k') ? alPhabat('K') :Container(),
+                  proChat.matchList.contains('k') ? alPhabat('K') :Container(),
                   getConList('k',proChat),
-                  matchList.contains('l') ? alPhabat('L') :Container(),
+                  proChat.matchList.contains('l') ? alPhabat('L') :Container(),
                   getConList('l',proChat),
-                  matchList.contains('m') ? alPhabat('M') :Container(),
+                  proChat.matchList.contains('m') ? alPhabat('M') :Container(),
                   getConList('m',proChat),
-                  matchList.contains('n') ? alPhabat('N') :Container(),
+                  proChat.matchList.contains('n') ? alPhabat('N') :Container(),
                   getConList('n',proChat),
-                  matchList.contains('o') ? alPhabat('O') :Container(),
+                  proChat.matchList.contains('o') ? alPhabat('O') :Container(),
                   getConList('o',proChat),
-                  matchList.contains('p') ? alPhabat('P') :Container(),
+                  proChat.matchList.contains('p') ? alPhabat('P') :Container(),
                   getConList('p',proChat),
-                  matchList.contains('q') ? alPhabat('Q') :Container(),
+                  proChat.matchList.contains('q') ? alPhabat('Q') :Container(),
                   getConList('q',proChat),
-                  matchList.contains('r') ? alPhabat('R') :Container(),
+                  proChat.matchList.contains('r') ? alPhabat('R') :Container(),
                   getConList('r',proChat),
-                  matchList.contains('s') ? alPhabat('S') :Container(),
+                  proChat.matchList.contains('s') ? alPhabat('S') :Container(),
                   getConList('s',proChat),
-                  matchList.contains('t') ? alPhabat('T') :Container(),
+                  proChat.matchList.contains('t') ? alPhabat('T') :Container(),
                   getConList('t',proChat),
-                  matchList.contains('u') ? alPhabat('U') :Container(),
+                  proChat.matchList.contains('u') ? alPhabat('U') :Container(),
                   getConList('u',proChat),
-                  matchList.contains('v') ? alPhabat('V') :Container(),
+                  proChat.matchList.contains('v') ? alPhabat('V') :Container(),
                   getConList('v',proChat),
-                  matchList.contains('w') ? alPhabat('W') :Container(),
+                  proChat.matchList.contains('w') ? alPhabat('W') :Container(),
                   getConList('w',proChat),
-                  matchList.contains('x') ? alPhabat('X') :Container(),
+                  proChat.matchList.contains('x') ? alPhabat('X') :Container(),
                   getConList('x',proChat),
-                  matchList.contains('y') ? alPhabat('Y') :Container(),
+                  proChat.matchList.contains('y') ? alPhabat('Y') :Container(),
                   getConList('y',proChat),
-                  matchList.contains('z') ? alPhabat('Z') :Container(),
+                  proChat.matchList.contains('z') ? alPhabat('Z') :Container(),
                   getConList('z',proChat),
 
                 ],
@@ -874,7 +960,7 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
       itemCount: chat.nameCont.length,
       itemBuilder: (contxt,i){
         print(chat.nameCont[i]);
-        // chat.addinMatchList(nameCont[i].name.substring(0,1).toLowerCase());
+
         if(chat.nameCont[i].name.startsWith(alph.toLowerCase(),0) || chat.nameCont[i].name.startsWith(alph.toUpperCase(),0)){
           return Padding(
             padding: const EdgeInsets.all(8.0),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 const String welcomeBg = 'assets/images/splash_bg.png';
@@ -33,3 +35,10 @@ double getHeight(BuildContext context) => MediaQuery.of(context).size.height;
 double getWidth(BuildContext context) => MediaQuery.of(context).size.width;
 
 const Color lightBlue = Color(0xffCEE5EE);
+
+String generateRandomString(int len) {
+  var r = Random();
+  const _chars = 'BCDEFGxcbHIJKLsdfdMNOPhfQRSTUdfdfcvVWXYZ';
+  // docId = List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+}

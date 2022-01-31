@@ -109,9 +109,56 @@ class ChatProvider extends ChangeNotifier {
     final pro = Provider.of<SignUpProvider>(context,listen: false);
     for(var i = 0; i < moveListt.length;i++){
       service.moveNetworks(pro.phone!, moveListt[i].phone, status).then((value){
-        getContacts(context);
+        getContactsFromFirebase(context);
+        moveListt.clear();
       });
     }
+  }
+
+  searchNetwork(String searchPertren){
+    for(var i = 0; i < friendsList.length;i++){
+      if(friendsList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        friendsList.removeAt(i);
+      }
+    }
+    for(var i = 0; i < familyList.length;i++){
+      if(familyList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        familyList.removeAt(i);
+      }
+    }
+    for(var i = 0; i < workList.length;i++){
+      if(workList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        workList.removeAt(i);
+      }
+    }
+    for(var i = 0; i < schoolList.length;i++){
+      if(schoolList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        schoolList.removeAt(i);
+      }
+    }
+    for(var i = 0; i < neghiborList.length;i++){
+      if(neghiborList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        neghiborList.removeAt(i);
+      }
+    }
+    for(var i = 0; i < othersList.length;i++){
+      if(othersList[i].name.toLowerCase().contains(searchPertren.toLowerCase())){
+
+      }else{
+        othersList.removeAt(i);
+      }
+    }
+    notifyListeners();
   }
 
   List matchList = [];
@@ -132,6 +179,9 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     Future.delayed(const Duration(seconds: 2), () {
+      for(int i = 0;i < nameCont.length;i++){
+        addinMatchList(nameCont[i].name.substring(0,1).toLowerCase());
+      }
       fetchNewtrork(context);
     });
     notifyListeners();
@@ -139,6 +189,7 @@ class ChatProvider extends ChangeNotifier {
 
   addinMatchList(String char){
     matchList.add(char);
+    // notifyListeners();
   }
 
   List<NewtWorkModel> netWorkLsit = [];
@@ -166,7 +217,8 @@ class ChatProvider extends ChangeNotifier {
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
               photo: value.docs[d]['profile_url'],
-              isSelect: false));
+              isSelect: false,
+          ));
         }
       });
       service.fetchSearch1(contactList, i, 'phone').then((value) {
@@ -176,7 +228,8 @@ class ChatProvider extends ChangeNotifier {
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
               photo: value.docs[d]['profile_url'],
-              isSelect: false));
+              isSelect: false
+          ));
         }
       });
       service.fetchSearch1(contactList, i, 'searchPhone').then((value) {
@@ -186,7 +239,9 @@ class ChatProvider extends ChangeNotifier {
               name: value.docs[d]['name'],
               phone: value.docs[d]['phone'],
               photo: value.docs[d]['profile_url'],
-              isSelect: false));
+              isSelect: false,
+
+          ));
         }
       });
     }
@@ -209,7 +264,18 @@ class ChatProvider extends ChangeNotifier {
     // Future.delayed(const Duration(seconds: 2),(){getContactsFromFirebase(context);});
   }
 
+  emptyNetworks(){
+    friendsList = [];
+    familyList = [];
+    workList = [];
+    neghiborList = [];
+    schoolList = [];
+    othersList = [];
+    notifyListeners();
+  }
+
   getContactsFromFirebase(BuildContext context){
+    emptyNetworks();
     final pro = Provider.of<SignUpProvider>(context,listen: false);
     for(var d =0;d < networkCatList.length;d++){
       service.getContactsFromFirebase(pro.phone!, d).then((value){

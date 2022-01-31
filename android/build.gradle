@@ -32,7 +32,7 @@ subprojects {
         }
     }
 }
-ext.flutterFFmpegPackage = 'full-lts'
+//ext.flutterFFmpegPackage = 'full-lts'
 
 task clean(type: Delete) {
     delete rootProject.buildDir

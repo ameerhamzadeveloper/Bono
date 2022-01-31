@@ -29,7 +29,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     super.initState();
-    Provider.of<SignUpProvider>(context,listen: false).getUser();
+    // Provider.of<SignUpProvider>(context,listen: false).getUser();
   }
   @override
   Widget build(BuildContext context) {

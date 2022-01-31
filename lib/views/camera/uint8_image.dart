@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Uint8ViewPage extends StatelessWidget {
   const Uint8ViewPage({Key? key, required this.bytes}) : super(key: key);
@@ -9,36 +11,11 @@ class Uint8ViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pro = Provider.of<FeedsProvider>(context);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.crop_rotate,
-                size: 27,
-              ),
-              onPressed: () {}),
-          IconButton(
-              icon: Icon(
-                Icons.emoji_emotions_outlined,
-                size: 27,
-              ),
-              onPressed: () {}),
-          IconButton(
-              icon: Icon(
-                Icons.title,
-                size: 27,
-              ),
-              onPressed: () {}),
-          IconButton(
-              icon: Icon(
-                Icons.edit,
-                size: 27,
-              ),
-              onPressed: () {}),
-        ],
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -53,42 +30,28 @@ class Uint8ViewPage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            Positioned(
+             Positioned(
               bottom: 0,
-              child: Container(
-                color: Colors.black38,
-                width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                child: TextFormField(
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
+              right: 0,
+              child: InkWell(
+                onTap: (){
+                  pro.assignImage(bytes);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Padding(
+                  padding:  EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 27,
+                    backgroundColor: Colors.blue,
+                    child:  Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 27,
+                    ),
                   ),
-                  maxLines: 6,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Add Caption....",
-                      prefixIcon: Icon(
-                        Icons.add_photo_alternate,
-                        color: Colors.white,
-                        size: 27,
-                      ),
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                      ),
-                      suffixIcon: CircleAvatar(
-                        radius: 27,
-                        backgroundColor: Colors.tealAccent[700],
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 27,
-                        ),
-                      )),
                 ),
-              ),
+              )
             ),
           ],
         ),

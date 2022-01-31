@@ -222,7 +222,7 @@ class SignUpProvider extends ChangeNotifier {
           if(value.exists == true){
             print("USer called Exist");
             saveToShared();
-            Navigator.pushNamed(context, bottomNav);
+            Navigator.pushNamed(context, laoding);
           }else{
             print("USer called Not Exost");
             Navigator.pushNamed(context, dobPage);
@@ -256,6 +256,7 @@ class SignUpProvider extends ChangeNotifier {
       for(var i in value.docs){
         print("docs my post $i");
         myPosts.add(i['image url']);
+        print("docs my post length ${myPosts.length}");
       }
       notifyListeners();
     });

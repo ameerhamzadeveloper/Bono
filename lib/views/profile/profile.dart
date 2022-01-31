@@ -1,7 +1,6 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 class ProfilePage extends StatefulWidget {
@@ -97,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     maxCrossAxisExtent: 100,
                   ),
                   itemBuilder: (ctx,i){
-                    return Image.network(pro.myPosts[i]);
+                    return Image.network(pro.myPosts.toSet().toList()[i],height: 100,fit: BoxFit.fill,);
                   },
                 )
               ],

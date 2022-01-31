@@ -145,6 +145,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Row(
                       children: [
+                        IconButton(
+                          onPressed: ()=> Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back),
+                        ),
                         Column(
                           children: [
                             CircleAvatar(
@@ -246,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 InkWell(
                                   onDoubleTap: (){
                                     print(data['id']);
-                                    proChat.likeMessage(data['senderID'] == pro.phone ? pro.phone! : widget.recieverPhone, data['senderID'] == pro.phone ? widget.recieverPhone : pro.phone!, data['id'],data['isFavorite']  == true? false:true);
+                                    proChat.likeMessage(data['senderID'] == pro.phone ? pro.phone! : widget.recieverPhone, data['senderID'] == pro.phone ? widget.recieverPhone : pro.phone!, data['id'],data['isFavorite']  == true ? false:true);
                                   },
                                   child: Container(
                                     width:getWidth(context) / 1.9,
@@ -263,10 +267,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                             width: getWidth(context) / 2,
                                             child: Image.network(data['message'],alignment: data['senderID'] == pro.phone ? Alignment.centerRight : Alignment.centerLeft,)),
                                         ),
-                                        Align(
+                                        data['isFavorite']  == true ? Align(
                                           alignment: data['senderID'] == pro.phone ? Alignment.centerLeft : Alignment.centerRight,
-                                          child: Icon(Icons.favorite,color: Colors.red,),
-                                        )
+                                          child: const Icon(Icons.favorite,color: Colors.red,),
+                                        ):Container()
                                       ],
                                     ),
                                   ),
@@ -281,7 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-            isKeyboardOpen ? SizedBox(height: 20,):Container(),
+            // isKeyboardOpen ? SizedBox(height: 50,):Container(),
             Container(
               color: Colors.grey[300],
               child: Stack(
@@ -354,7 +358,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 30,),
+                          // const SizedBox(width: 30,),
                          // SizedBox(width: 10,),
                          Padding(
                            padding: const EdgeInsets.all(8.0),
@@ -376,28 +380,28 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment(0.8,-0.4),
-                    child: Container(
-                      height: 60,
-                      child: GestureDetector(
-                        onLongPress: (){
-                          setState(() {
-                            isRecording = true;
-                          });
-                          startTime();
-                        },
-                        child: Icon(Icons.mic),
-                        onLongPressEnd: (va){
-                          setState(() {
-                            isRecording = false;
-                          });
-                          stopTime();
-
-                        },
-                      ),
-                    ),
-                  )
+                  // Align(
+                  //   alignment: Alignment(0.8,-0.4),
+                  //   child: Container(
+                  //     height: 60,
+                  //     child: GestureDetector(
+                  //       onLongPress: (){
+                  //         setState(() {
+                  //           isRecording = true;
+                  //         });
+                  //         startTime();
+                  //       },
+                  //       child: Icon(Icons.mic),
+                  //       onLongPressEnd: (va){
+                  //         setState(() {
+                  //           isRecording = false;
+                  //         });
+                  //         stopTime();
+                  //
+                  //       },
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
             ),
