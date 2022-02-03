@@ -76,5 +76,18 @@ class FeedsService{
     });
   }
 
+  Future<Map<String,dynamic>> getNetworkProfile(String phone)async{
+    Map<String,dynamic>? data;
+    await FirebaseFirestore.instance.collection('users').doc(phone).get().then((value){
+      data = value.data()!;
+    });
+    return data!;
+  }
+  Future<QuerySnapshot<Map<String, dynamic>>> getUsersPost(String phone)async{
+    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').where('phone',isEqualTo: phone).get();
+    return data;
+  }
+
+
 
 }

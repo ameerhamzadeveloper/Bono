@@ -1,22 +1,22 @@
 import 'package:bono_gifts/config/constants.dart';
+import 'package:bono_gifts/provider/feeds_provider.dart';
 import 'package:bono_gifts/provider/sign_up_provider.dart';
-import 'package:bono_gifts/routes/routes_names.dart';
+import 'package:bono_gifts/views/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class UserProfile extends StatefulWidget {
+  const UserProfile({Key? key}) : super(key: key);
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _UserProfileState createState() => _UserProfileState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  @override
-  var formtr = DateFormat('MMM');
+class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
-    final pro = Provider.of<SignUpProvider>(context);
+    var formtr = DateFormat('MMM');
+    final pro = Provider.of<FeedsProvider>(context);
     return Scaffold(
       body: pro.name == null ? Center(child: CircularProgressIndicator(),):
       SafeArea(
@@ -32,32 +32,34 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       MaterialButton(
                         color: Colors.grey[300],
-                        onPressed: ()=>pro.logout(context),
-                        child: const Text("Sign out"),
+                        onPressed: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(recieverName: pro.name!,profileImage: pro.photo!,recieverPhone:pro.phonee!)));
+                        },
+                        child: const Text("Chat"),
                       ),
                       // const SizedBox(width: 20,),
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(pro.userImage!),
+                        backgroundImage: NetworkImage(pro.photo!),
                       ),
                       // const SizedBox(width: 20,),
                       MaterialButton(
                         color: Colors.grey,
-                        onPressed: ()=> Navigator.pushNamed(context, editProfile),
-                        child: const Text("Edit Profile",style: TextStyle(color: Colors.white),),
+                        onPressed: (){},
+                        child: const Text("Buy gift",style: TextStyle(color: Colors.white),),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20,),
                 Text(pro.name!,style: const TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
-                Text(pro.phoneNumber.text),
+                Text(pro.phonee!),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.location_on),
                     const Text("Location:"),
-                    Text("${pro.room.text} ${pro.buildingName.text} ${pro.area.text} ${pro.street.text} ${pro.country}"),
+                    Text("${pro.room!} ${pro.building!} ${pro.area!} ${pro.street!} ${pro.country}"),
                   ],
                 ),
                 Container(
@@ -67,14 +69,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Birthday ${pro.dobFormat!.day} ${formtr.format(pro.dobFormat!)}",style: TextStyle(color: Colors.white,fontSize: 18),),
+                      Text("Birthday ${pro.dob!.day} ${formtr.format(pro.dob!)}",style: TextStyle(color: Colors.white,fontSize: 18),),
                       const SizedBox(height: 5,),
-                      Text("${pro.diffDays} Days Left",style: const TextStyle(color: Colors.white,fontSize: 25,fontWeight: FontWeight.w500),),
+                      Text("${pro.networkDiffDays} Days Left",style: const TextStyle(color: Colors.white,fontSize: 25,fontWeight: FontWeight.w500),),
                     ],
                   ),
                 ),
                 const SizedBox(height: 5,),
-                pro.myPosts.length == 0 ? Container(
+                pro.postsUsers.length == 0 ? Container(
                   height: 40,
                   color: lightBlue,
                   child: Center(
@@ -83,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ) : Container(),
                 const SizedBox(height: 5,),
                 GridView.builder(
-                  itemCount: pro.myPosts.length,
+                  itemCount: pro.postsUsers.length,
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   gridDelegate:
@@ -94,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     maxCrossAxisExtent: 100,
                   ),
                   itemBuilder: (ctx,i){
-                    return Image.network(pro.myPosts.toSet().toList()[i],height: 100,fit: BoxFit.fill,);
+                    return Image.network(pro.postsUsers.toSet().toList()[i],height: 100,fit: BoxFit.fill,);
                   },
                 )
               ],

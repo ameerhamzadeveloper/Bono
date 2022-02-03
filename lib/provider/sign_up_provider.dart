@@ -117,7 +117,7 @@ class SignUpProvider extends ChangeNotifier {
     markers[markerId] = marker;
   }
 
-  signUpUser(BuildContext context){
+  signUpUser(BuildContext context,bool isInit){
     Map<String,dynamic> userMap = {
       'phone':'$dailCode${phoneNumber.text.replaceAll(' ', '')}',
       'name': name,
@@ -133,10 +133,37 @@ class SignUpProvider extends ChangeNotifier {
       'searchPhone':'0${phoneNumber.text}',
     };
     service.saveToFirebase(userMap).then((value){
-      saveToShared();
+      saveToShared(true);
       makeWatingDone();
-      if(value)
-       { Navigator.pushReplacementNamed(context, bottomNav);}
+      if(value && isInit)
+       { Navigator.pushReplacementNamed(context, bottomNav);}else{
+        getUser();
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  updateProfile(BuildContext context)async{
+    Map<String,dynamic> userMap = {
+      'phone':phoneNumber.text,
+      'name': name,
+      'dob': dob,
+      'dobFormat':dobFormat,
+      'email': email,
+      'image':bytesImage,
+      'country': country,
+      'villa':room.text,
+      'buildingName':buildingName.text,
+      'area':area.text,
+      'street':street.text,
+    };
+    service.updateUserProfile(userMap,phone!).then((value){
+      saveToShared(false);
+      makeWatingDone();
+      if(value) {
+        getUser();
+        Navigator.pop(context);
+      }
     });
   }
   Timestamp? userDate;
@@ -144,7 +171,6 @@ class SignUpProvider extends ChangeNotifier {
 
   getUser()async{
     await service.getUser(phone!).then((data){
-
       phoneNumber = TextEditingController(text:data['phone']);
       name = data['name'];
       dob = data['dob'];
@@ -161,16 +187,22 @@ class SignUpProvider extends ChangeNotifier {
     });
     getMyPhoto();
   }
-  saveToShared()async{
+  saveToShared(bool isInit)async{
     SharedPreferences pre = await SharedPreferences.getInstance();
-    pre.setString('phone', '$dailCode${phoneNumber.text}');
+    if(isInit == true){
+      pre.setString('phone', '$dailCode${phoneNumber.text}');
+    }else{
+      pre.setString('phone', phoneNumber.text);
+    }
     getUser();
   }
+
    getSharedData()async{
     SharedPreferences pre = await SharedPreferences.getInstance();
     var ph = pre.getString('phone');
     phoneNumber = TextEditingController(text: ph);
     phone = ph;
+    print("=============================----------------$ph");
 
     if(phone != null || phone != '' || phoneNumber.text != null || phoneNumber.text != ''){
       getUser();
@@ -221,7 +253,7 @@ class SignUpProvider extends ChangeNotifier {
           print(value);
           if(value.exists == true){
             print("USer called Exist");
-            saveToShared();
+            saveToShared(true);
             Navigator.pushNamed(context, laoding);
           }else{
             print("USer called Not Exost");
@@ -252,7 +284,9 @@ class SignUpProvider extends ChangeNotifier {
   }
 
   getMyPhoto(){
+    myPosts.clear();
     service.getMyPhotoy(phone!).then((value){
+      print(phone!);
       for(var i in value.docs){
         print("docs my post $i");
         myPosts.add(i['image url']);

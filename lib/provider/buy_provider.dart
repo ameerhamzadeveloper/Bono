@@ -22,7 +22,6 @@ class BuyProvider extends ChangeNotifier{
       getDateDiff();
       notifyListeners();
     });
-
   }
 
   clearAll(){

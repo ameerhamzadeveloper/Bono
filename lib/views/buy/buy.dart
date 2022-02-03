@@ -1,5 +1,6 @@
 import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/buy_provider.dart';
+import 'package:bono_gifts/routes/routes_names.dart';
 import 'package:bono_gifts/views/buy/select_network.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -51,7 +52,9 @@ class _BuyPageState extends State<BuyPage> {
                       Text("Birthday ${form.format(pro.userDob!).toString()} (In ${pro.diffDays} Days)",style: TextStyle(color: Colors.blue),),
                     ],
                   ),
-                  IconButton(onPressed: (){}, icon: Icon(Icons.clear))
+                  IconButton(onPressed: (){
+                    pro.clearAll();
+                  }, icon: Icon(Icons.clear))
                 ],
               ),
             ):
@@ -91,6 +94,25 @@ class _BuyPageState extends State<BuyPage> {
                 ),
               ),
             ),
+            const SizedBox(height: 20,),
+            pro.userName != null ?
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Delivery Address : Available"),
+                    Text("Location : ${pro.userAddress}"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        MaterialButton(
+                          onPressed: ()=>Navigator.pushNamed(context, orderSummry),
+                          color: Colors.grey,
+                          child: Text("Next",style: TextStyle(color: Colors.white),),
+                        )
+                      ],
+                    )
+                  ],
+                ):Container()
           ],
         ),
       ),

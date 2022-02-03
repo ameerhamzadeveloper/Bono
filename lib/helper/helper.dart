@@ -292,6 +292,6 @@ class DailCode {
     {"name": "Yemen", "dial_code": "+967", "code": "YE"},
     {"name": "Zambia", "dial_code": "+260", "code": "ZM"},
     {"name": "Zimbabwe", "dial_code": "+263", "code": "ZW"},
-    {"name": "Åland Islands", "dial_code": "+358", "code": "AX"}
+    {"name": "Åland Islands", "dial_code": "+358", "code": "AX"},
   ];
 }

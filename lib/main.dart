@@ -36,9 +36,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Bono gifts',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: ThemeData(primarySwatch: Colors.blue,),
         onGenerateRoute: CustomRoutes.allRoutes,
         initialRoute: laoding,
       ),

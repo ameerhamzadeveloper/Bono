@@ -112,6 +112,50 @@ class SignUpService{
     return true;
   }
 
+  Future<bool> updateUserProfile(Map<String,dynamic> map,String phone)async{
+    String defaultImage = "https://firebasestorage.googleapis.com/v0/b/bonogifts.appspot.com/o/profile.png?alt=media&token=dec6afee-44f3-4876-8f2b-dbb2be0dd4d8";
+    final DocumentReference ref = FirebaseFirestore.instance.collection('users').doc(map['phone']);
+
+    if(map['image'] == null ){
+      print("Image null");
+      var userData = {
+        'name': map['name'],
+        'email': map['email'],
+        'phone': map['phone'],
+        'timestamp': DateTime.now(),
+        'dobFormat':map['dobFormat'],
+        'country':map['country'],
+        'villa':map['villa'],
+        'buildingName':map['buildingName'],
+        'area':map['area'],
+        'street':map['street'],
+      };
+      await ref.update(userData);
+    }
+    else{
+      print("Image NOT null");
+      var snapshot = await FirebaseStorage.instance.ref().child('Profile Pictures/${map['phone']}').putData(map['image']);
+
+      var url = (await snapshot.ref.getDownloadURL()).toString();
+      var userData = {
+        'name': map['name'],
+        'email': map['email'],
+        'phone': map['phone'],
+        'profile_url': url,
+        'image url': url,
+        'timestamp': DateTime.now(),
+        'dobFormat':map['dobFormat'],
+        'country':map['country'],
+        'villa':map['villa'],
+        'buildingName':map['buildingName'],
+        'area':map['area'],
+        'street':map['street'],
+      };
+      await ref.update(userData);
+    }
+    return true;
+  }
+
   Future<Map<String,dynamic>> getUser(String phone)async{
     Map<String,dynamic>? data;
     await firestore.collection('users').doc(phone).get().then((value){

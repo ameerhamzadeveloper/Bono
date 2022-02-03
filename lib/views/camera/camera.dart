@@ -83,7 +83,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                     snapshot.data!,
                                     height: 80,
                                     width: 60,
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               );

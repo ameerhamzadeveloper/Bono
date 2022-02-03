@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 const String welcomeBg = 'assets/images/splash_bg.png';
@@ -13,7 +12,6 @@ const String photoIcon = 'assets/images/icons/camera_image icon.png';
 const String buyIcon = 'assets/images/icons/buy_icon.png';
 const String cameraICon = 'assets/images/icons/camera_icon.png';
 const String profieIcon = 'assets/images/icons/profile_icon.png';
-
 
 const String chatIconGrey = 'assets/images/chat-icon-grey.png';
 const String chatIconBlue = 'assets/images/chat-icon-blue.png';
@@ -36,9 +34,7 @@ double getWidth(BuildContext context) => MediaQuery.of(context).size.width;
 
 const Color lightBlue = Color(0xffCEE5EE);
 
-String generateRandomString(int len) {
-  var r = Random();
-  const _chars = 'BCDEFGxcbHIJKLsdfdMNOPhfQRSTUdfdfcvVWXYZ';
-  // docId = List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
-  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
-}
+var r = Random();
+const _chars = 'BCDEFGxcbHIJKLsdfdMNOPhfQRSTUdfdfcvVWXYZ';
+String generateRandomString(int len) => List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+

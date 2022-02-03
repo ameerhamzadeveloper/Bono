@@ -85,31 +85,39 @@ class _FeedsState extends State<Feeds> {
                     itemBuilder: (ctx,i){
                       return Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            color:Colors.white,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                    pro.feeds[i].profileName,
-                                  style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400),
-                                ),
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: NetworkImage(
-                                    pro.feeds[i].profileImage
+                          InkWell(
+                            onTap:(){
+                              pro.getNetworkUserData(pro.feeds[i].phone);
+                              Future.delayed(Duration(seconds: 1),(){
+                                Navigator.pushNamed(context, userProfile);                
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              color:Colors.white,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                      pro.feeds[i].profileName,
+                                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400),
                                   ),
-                                ),
-                                // SizedBox(
-                                //   height: 7,
-                                // ),
-                                Text(
-                                  formt.format(pro.feeds[i].date).toString(),
-                                  style: TextStyle(color: Colors.black,fontSize: 12),
-                                ),
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: NetworkImage(
+                                      pro.feeds[i].profileImage
+                                    ),
+                                  ),
+                                  // SizedBox(
+                                  //   height: 7,
+                                  // ),
+                                  Text(
+                                    formt.format(pro.feeds[i].date).toString(),
+                                    style: TextStyle(color: Colors.black,fontSize: 12),
+                                  ),
 
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           // const SizedBox(

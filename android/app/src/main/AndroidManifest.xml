@@ -13,7 +13,7 @@
         />
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
    <application
-        android:label="bono_gifts"
+        android:label="Bono Gift"
        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
        android:usesCleartextTraffic="true">

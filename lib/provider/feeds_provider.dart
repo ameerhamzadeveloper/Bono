@@ -286,6 +286,54 @@ class FeedsProvider extends ChangeNotifier{
 
   }
 
+    String? photo;
+    String? phonee;
+    DateTime? dob;
+    String? name;
+    String? building;
+    String? area;
+    String? street;
+    String? room;
+    String? country;
+    List postsUsers = [];
+    String? networkDiffDays;
+
+  getNetworkUserData(String phone)async{
+    await service.getNetworkProfile(phone).then((data){
+      dob = data['dobFormat'].toDate();
+      name = data['name'];
+      photo = data['profile_url'];
+      area = data['area'];
+      building = data['buildingName'];
+      room = data['villa'];
+      street = data['street'];
+      country = data['country'];
+      phonee = data['phone'];
+      getDateDiff();
+      notifyListeners();
+      print(data);
+    });
+    await service.getUsersPost(phone).then((value){
+      postsUsers = [];
+      for(var i in value.docs){
+        print("docs my post $i");
+        postsUsers.add(i['image url']);
+        print("docs my post length ${postsUsers.length}");
+      }
+      print(value.docs);
+      notifyListeners();
+    });
+    notifyListeners();
+  }
+  getDateDiff(){
+    DateTime d = DateTime.now();
+    var daOfBirth = DateTime(d.year,dob!.month,dob!.day);
+    var todayDate = DateTime(d.year,d.month,d.day);
+    var io = daOfBirth.difference(todayDate).inDays;
+    networkDiffDays = io.toString();
+    notifyListeners();
+  }
+
 
 }
 class LikeClass{

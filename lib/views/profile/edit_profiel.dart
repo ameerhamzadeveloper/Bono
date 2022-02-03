@@ -4,16 +4,17 @@ import 'package:bono_gifts/provider/sign_up_provider.dart';
 import 'package:bono_gifts/views/signup/delivery_address.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 
-class CreateProfile extends StatefulWidget {
-  const CreateProfile({Key? key}) : super(key: key);
+class EditProfile extends StatefulWidget {
+  const EditProfile({Key? key}) : super(key: key);
   @override
-  _CreateProfileState createState() => _CreateProfileState();
+  _EditProfileState createState() => _EditProfileState();
 }
-class _CreateProfileState extends State<CreateProfile> {
+class _EditProfileState extends State<EditProfile> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
   var formt = DateFormat('dd-MMM-yyyy');
   @override
@@ -40,11 +41,11 @@ class _CreateProfileState extends State<CreateProfile> {
                           width: 210,
                           child: Stack(
                             children: [
-                              const Align(
+                               Align(
                                 alignment:Alignment.center,
                                 child:  CircleAvatar(
                                   radius: 70,
-                                  backgroundImage: AssetImage(defaultImage),
+                                  backgroundImage: NetworkImage(pro.userImage!),
                                 ),
                               ),
                               Align(
@@ -98,6 +99,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       child: Padding(
                         padding: const EdgeInsets.only(left:8.0),
                         child: TextFormField(
+                          controller: TextEditingController(text:pro.name!),
                           validator: (val){
                             if(val!.isEmpty){
                               return "Name is Required";
@@ -108,8 +110,8 @@ class _CreateProfileState extends State<CreateProfile> {
                           },
                           textAlign: TextAlign.center,
                           decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Enter Your Name",
+                            border: InputBorder.none,
+                            hintText: "Enter Your Name",
                           ),
                         ),
                       ),
@@ -118,27 +120,44 @@ class _CreateProfileState extends State<CreateProfile> {
                   const SizedBox(height: 10,),
                   const Text("Age*"),
                   const SizedBox(height: 10,),
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left:8.0),
-                        child: Container(
-                          height: 40,
-                          // padding: const EdgeInsets.all(6),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Container(
-                                //   width: getWidth(context) / 6,
-                                // ),
-                                Center(child: Text(pro.dob ?? formt.format(pro.todayDate))),
-                                // TextButton(onPressed: (){}, child: Text("edit"))
-                              ],
-                            ))
+                  InkWell(
+                    onTap: (){
+                      DatePicker.showPicker(
+                        context,
+                        showTitleActions: true,
+                        // minTime: DateTime(1950, 3, 5),
+                        // maxTime: DateTime.now(),
+                        onChanged: (date) {
+                          var formt = DateFormat('dd-MMM-yyyy');
+
+                          pro.setDOB(formt.format(date).toString(),date);
+                        }, onConfirm: (date) {
+
+                      },);
+                      // currentTime: DateTime.now(), locale: LocaleType.en);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: Center(
+                        child: Padding(
+                            padding: const EdgeInsets.only(left:8.0),
+                            child: Container(
+                                height: 40,
+                                // padding: const EdgeInsets.all(6),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Container(
+                                    //   width: getWidth(context) / 6,
+                                    // ),
+                                    Center(child: Text(pro.dob ?? formt.format(pro.todayDate))),
+                                    // TextButton(onPressed: (){}, child: Text("edit"))
+                                  ],
+                                ))
+                        ),
                       ),
                     ),
                   ),
@@ -153,23 +172,24 @@ class _CreateProfileState extends State<CreateProfile> {
                     ),
                     child: Center(
                       child: Padding(
-                          padding: const EdgeInsets.only(left:8.0),
-                          child: TextFormField(
-                            validator: (val){
-                              if(val!.isEmpty){
-                                return "Phone is Required";
-                              }
-                            },
-                            onChanged: (val){
-                              pro.setPhoneNum(val);
-                            },
-                            controller: pro.phoneNumber,
-                            textAlign: TextAlign.center,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Enter Your Name",
-                            ),
+                        padding: const EdgeInsets.only(left:8.0),
+                        child: TextFormField(
+                          readOnly: true,
+                          validator: (val){
+                            if(val!.isEmpty){
+                              return "Phone is Required";
+                            }
+                          },
+                          onChanged: (val){
+                            pro.setPhoneNum(val);
+                          },
+                          controller: pro.phoneNumber,
+                          textAlign: TextAlign.center,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Enter Your Name",
                           ),
+                        ),
                       ),
                     ),
                   ),
@@ -186,6 +206,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       child: Padding(
                         padding: const EdgeInsets.only(left:8.0),
                         child: TextFormField(
+                          controller: TextEditingController(text: pro.email),
                           textAlign: TextAlign.center,
                           onChanged: (val){
                             pro.setEmail(val);
@@ -208,31 +229,31 @@ class _CreateProfileState extends State<CreateProfile> {
                     ),
                     child: Center(
                       child: Padding(
-                          padding: const EdgeInsets.only(left:8.0),
-                          child: SizedBox(
-                              height: 45,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Container(
-                                  //   width: getWidth(context) / 6,
-                                  // ),
-                                  CountryCodePicker(
-                                    onChanged: (val)=> pro.setDialCode(val.dialCode!),
-                                    enabled: true,
-                                    showFlagMain: true,
-                                    showCountryOnly: true,
-                                    initialSelection: pro.code,
-                                    // showCountryOnly: true,
-                                    // showOnlyCountryWhenClosed: false,
-                                    alignLeft: false,
-                                    // showDropDownButton: true,
-                                    showOnlyCountryWhenClosed: true,
-                                  ),
-                                  // TextButton(onPressed: (){}, child: Text("edit"))
-                                ],
+                        padding: const EdgeInsets.only(left:8.0),
+                        child: SizedBox(
+                          height: 45,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Container(
+                              //   width: getWidth(context) / 6,
+                              // ),
+                              CountryCodePicker(
+                                onChanged: (val)=> pro.setDialCode(val.dialCode!),
+                                enabled: true,
+                                showFlagMain: true,
+                                showCountryOnly: true,
+                                initialSelection: pro.code,
+                                // showCountryOnly: true,
+                                // showOnlyCountryWhenClosed: false,
+                                alignLeft: false,
+                                // showDropDownButton: true,
+                                showOnlyCountryWhenClosed: true,
                               ),
+                              // TextButton(onPressed: (){}, child: Text("edit"))
+                            ],
                           ),
+                        ),
                       ),
                     ),
                   ),
@@ -256,41 +277,41 @@ class _CreateProfileState extends State<CreateProfile> {
                       child: Padding(
                           padding: const EdgeInsets.only(left:8.0),
                           child: SizedBox(
-                              height: 45,
-                              // padding: const EdgeInsets.all(6),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: getWidth(context) / 6,
-                                  ),
-                                  Text(pro.deliTitle),
-                                  TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (contxt) => const DeliveryAddress(isFromDob: false)));}, child: Text("edit"),
-                                  ),
-                                ],
-                              ),
+                            height: 45,
+                            // padding: const EdgeInsets.all(6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: getWidth(context) / 6,
+                                ),
+                                Text(pro.deliTitle),
+                                TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (contxt) => const DeliveryAddress(isFromDob: false)));}, child: Text("edit"),
+                                ),
+                              ],
+                            ),
                           )
                       ),
                     ),
                   ),
                   MaterialButton(
-                   color: Colors.blue,
-                   onPressed: (){},
-                   child: Row(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                      const Text("Add More Delivery Address",style: TextStyle(color: Colors.white),),
-                      const SizedBox(width: 10,),
-                      Image.asset(addBtn,height: 20,width: 20,)
-                    ],
-                   ),
+                    color: Colors.blue,
+                    onPressed: (){},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Add More Delivery Address",style: TextStyle(color: Colors.white),),
+                        const SizedBox(width: 10,),
+                        Image.asset(addBtn,height: 20,width: 20,)
+                      ],
+                    ),
                   ),
                   MaterialButton(
                     minWidth: getWidth(context),
                     color: Colors.blue,
                     onPressed: (){
                       pro.makeWatingState();
-                      pro.signUpUser(context,true);
+                      pro.updateProfile(context);
                     },
                     child: pro.isWaitingCon ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white),):const Text("Done",style: TextStyle(color: Colors.white),),
                   )
