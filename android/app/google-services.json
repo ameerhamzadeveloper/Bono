@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "3551348354-0kusub3knnk9gt4l6tbuamlftq7g7hmg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marianatech.bono_gifts",
+            "certificate_hash": "b682daa3b4e34bb65da4892ada1eec7b2ba9deff"
+          }
+        },
+        {
           "client_id": "3551348354-gdgb9giqpie253ffn7fr90lejf43blse.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -37,6 +45,13 @@
             {
               "client_id": "3551348354-gbqbstnog73q83ltuus1bcs6e6imokbu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "3551348354-aokv6ihgoi0l92soptl942jp83593uv5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.marianatech.bonoGifts"
+              }
             }
           ]
         }
