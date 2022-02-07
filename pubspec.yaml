@@ -68,12 +68,16 @@ dependencies:
 
 #  state
   provider: ^6.0.2
+
 #  firebase
   firebase_auth: ^3.3.5
   firebase_core: ^1.11.0
   cloud_firestore: ^3.1.6
   firebase_storage: ^10.2.5
   http: ^0.13.4
+
+  # RestAPI client
+  dio: ^4.0.4
 
 dev_dependencies:
   flutter_test:
