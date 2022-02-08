@@ -1,3 +1,4 @@
+import 'package:bono_gifts/models/product_models.dart';
 import 'package:bono_gifts/models/wcmp_api/vendor.dart';
 import 'package:bono_gifts/models/wcmp_api/vendor_product.dart';
 import 'package:bono_gifts/services/sign_up_service.dart';
@@ -17,11 +18,24 @@ class WooCommerceMarketPlaceProvider extends ChangeNotifier {
   final SignUpService signUpService = SignUpService();
 
   ApiState apiState = ApiState.none;
+  String? size;
+  String? price;
+  String? name;
+  String? image;
+  DateTime? dobFormat;
+  String? dob;
+  DateTime todayDate = DateTime.now();
 
   List<Vendor> allVendors = <Vendor>[];
   List<Vendor> nearbyVendors = <Vendor>[];
   List<Categories> categories = [];
+  List<CategoriesShow> categoriesshow = [];
   List<VendorProduct> nearbyVendorProducts = <VendorProduct>[];
+  setDOB(String dobb, DateTime date) {
+    dob = dobb;
+    dobFormat = date;
+    notifyListeners();
+  }
 
   Future<void> fetchVendors(String city) async {
     clearShops();
@@ -49,6 +63,7 @@ class WooCommerceMarketPlaceProvider extends ChangeNotifier {
           }
           if (!found) {
             categories.add(product.categories![product.categories!.length - 1]);
+            categoriesshow.add(CategoriesShow(isSelected: false,name: product.categories![product.categories!.length -1].name,id: product.categories![product.categories!.length -1].id,slug: product.categories![product.categories!.length -1].slug));
           }
         }
       }
@@ -71,6 +86,14 @@ class WooCommerceMarketPlaceProvider extends ChangeNotifier {
 
   Future<Map<String, dynamic>> getUserInfo(String phone) async {
     return await signUpService.getUser(phone);
+  }
+
+  assignSumery(String pricee,String weight,String namee,String imagee){
+    size = weight;
+    price = pricee;
+    name = namee;
+    image = imagee;
+    notifyListeners();
   }
 
   clearShops() {

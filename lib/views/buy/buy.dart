@@ -2,6 +2,7 @@ import 'package:bono_gifts/config/constants.dart';
 import 'package:bono_gifts/provider/buy_provider.dart';
 import 'package:bono_gifts/provider/wcmp_provider.dart';
 import 'package:bono_gifts/routes/routes_names.dart';
+import 'package:bono_gifts/views/buy/order_summry.dart';
 import 'package:bono_gifts/views/buy/select_network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _BuyPageState extends State<BuyPage> {
     var form = DateFormat('dd-MMM');
     final pro = Provider.of<BuyProvider>(context);
     final wcmp = Provider.of<WooCommerceMarketPlaceProvider>(context);
+    int inde = 1000000;
 
     return Scaffold(
       body: Padding(
@@ -155,14 +157,15 @@ class _BuyPageState extends State<BuyPage> {
             const SizedBox(
               height: 20,
             ),
-            giftWidget(wcmp),
+            giftWidget(wcmp,inde),
           ],
         ),
       ),
     );
   }
 
-  Widget giftWidget(WooCommerceMarketPlaceProvider provider) {
+  Widget giftWidget(WooCommerceMarketPlaceProvider provider,int inde) {
+
     switch (provider.apiState) {
       case ApiState.none:
         return Container();
@@ -188,7 +191,7 @@ class _BuyPageState extends State<BuyPage> {
                 : SingleChildScrollView(
                     child: Column(
                       children: List.generate(
-                        provider.categories.length,
+                        provider.categoriesshow.length,
                         (index) => Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -198,7 +201,7 @@ class _BuyPageState extends State<BuyPage> {
                             Row(
                               children: [
                                 Text(
-                                  provider.categories[index].name ?? '',
+                                  provider.categoriesshow[index].name ?? '',
                                   textAlign: TextAlign.start,
                                 ),
                               ],
@@ -211,53 +214,69 @@ class _BuyPageState extends State<BuyPage> {
                               child: ListView.separated(
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, prodIndex) => Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: 75,
-                                      width: 75,
-                                      child: Image.network(provider
-                                          .filterByCategory(provider
-                                              .categories[index])[prodIndex]
-                                          .images!
-                                          .first
-                                          .src!),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: 4.0,
+                                itemBuilder: (context, prodIndex) => InkWell(
+                                  onTap: (){
+                                    provider.assignSumery(
+                                      provider.filterByCategory(provider.categories[index])[prodIndex].price!,
+                                      provider.filterByCategory(provider.categories[index])[prodIndex].weight!,
+                                      provider.filterByCategory(provider.categories[index])[prodIndex].name!,
+                                        provider.filterByCategory(provider.categories[index])[prodIndex].images!.first.src!,
+                                    );
+                                    Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) => OrderSummry()
+                                    ));
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 75,
+                                        width: 75,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(width: 3,color: inde == prodIndex ? Colors.blue : Colors.grey)
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${provider.filterByCategory(provider.categories[index])[prodIndex].name!}",
-                                              textAlign: TextAlign.start,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 4.0,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                "Price ${provider.filterByCategory(provider.categories[index])[prodIndex].price!}",
-                                                textAlign: TextAlign.start),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                        child: Image.network(provider
+                                            .filterByCategory(provider
+                                                .categories[index])[prodIndex]
+                                            .images!
+                                            .first
+                                            .src!),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 4.0,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${provider.filterByCategory(provider.categories[index])[prodIndex].name!}",
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 4.0,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                              children: [
+                                              Text(
+                                                  "Price ${provider.filterByCategory(provider.categories[index])[prodIndex].price!}",
+                                                  textAlign: TextAlign.start),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                separatorBuilder: (context, index) => SizedBox(
+                                separatorBuilder: (context, index) => const SizedBox(
                                   width: 8.0,
                                 ),
                                 itemCount: provider

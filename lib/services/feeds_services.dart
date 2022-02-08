@@ -29,7 +29,7 @@ class FeedsService{
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getFeedsPosts()async{
-    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').orderBy('timestamp').limit(50).get();
+    Future<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore.instance.collection('userPosts').orderBy('timestamp',descending: true).get();
     return data;
   }
   

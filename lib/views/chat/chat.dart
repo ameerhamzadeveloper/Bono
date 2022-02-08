@@ -173,10 +173,10 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
     super.initState();
     final proChat = Provider.of<ChatProvider>(context,listen: false);
     _tabController = TabController(length: 3, vsync: this);
-   Future.delayed(Duration(seconds: 2),(){
+   Future.delayed(const Duration(seconds: 2),(){
      proChat.getContacts(context,);
    });
-   Future.delayed(Duration(seconds: 4),(){
+   Future.delayed(const Duration(seconds: 4),(){
      proChat.getContactsFromFirebase(context);
     });
   }
@@ -201,7 +201,6 @@ class _ChatState extends State<Chat>  with TickerProviderStateMixin{
                   borderRadius: BorderRadius.circular(
                     10,
                   ),
-
                 ),
                 child: TabBar(
                   controller: _tabController,

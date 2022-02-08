@@ -117,8 +117,8 @@ class _SelectDOBState extends State<SelectDOB> {
                 children: [
                   TextButton(
                     onPressed: (){
-                      pro.checkIfUSer('+923033374110');
-                      // Navigator.pop(context);
+                      // pro.checkIfUSer('+923033374110');
+                      Navigator.pop(context);
                       },
                     child: const Text("Cancel"),
                   ),

@@ -46,6 +46,7 @@ dependencies:
   emoji_picker_flutter: ^1.0.8
   auto_size_text_field: ^1.0.1
   scroll_to_index: ^2.1.0
+  line_icons: ^2.0.1
 
 #  storage
   shared_preferences: ^2.0.12
@@ -78,6 +79,12 @@ dependencies:
 
   # RestAPI client
   dio: ^4.0.4
+
+#  paymnets
+  flutter_braintree: ^2.2.0
+
+
+  change_app_package_name: ^1.0.0
 
 dev_dependencies:
   flutter_test:

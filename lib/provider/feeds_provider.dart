@@ -115,7 +115,7 @@ class FeedsProvider extends ChangeNotifier{
   }
 
   getImage()async{
-    XFile? tempImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 70,maxHeight: 200,maxWidth: 200);
+    XFile? tempImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     image = tempImage;
     bytesImage = await image!.readAsBytes();
     notifyListeners();
@@ -174,23 +174,27 @@ class FeedsProvider extends ChangeNotifier{
     feeds.clear();
     final pro = Provider.of<SignUpProvider>(context,listen: false);
     await service.getFeedsPosts().then((value){
-      for(var fed in value.docs){
+      value.docs.forEach((fed) {
         feeds.add(FeedsModels(image: fed['image url'], description: fed['des'],
-            title: fed['title'], date: fed['timestamp'].toDate(),
-            profileImage: fed['profileImage'],profileName: fed['profileName'],
+          title: fed['title'], date: fed['timestamp'].toDate(),
+          profileImage: fed['profileImage'],profileName: fed['profileName'],
           isDesOpen: false,phone: fed['phone'],docid: fed.id,
           like: fed['like'],
           share: fed['share'],
           isLiked: false,
-         ),
+        ),
         );
+        print("Feeds list length ${feeds.length}");
         notifyListeners();
-      }
+      });
+      print("docs length ${value.docs.length}");
       for(var f = 0; f < feeds.length;f++){
         service.getLikePost(pro.phone!, feeds[f].docid).then((value) {
           if(value == true){
+            print("true");
             feeds[f].isLiked = true;
           }else{
+            print("false");
             feeds[f].isLiked = false;
           }
         });

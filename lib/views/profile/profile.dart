@@ -129,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         itemBuilder: (ctx, i) {
                           return Image.network(
                             pro.myPosts.toSet().toList()[i],
-                            height: 100,
+                            // height: 100,
                             fit: BoxFit.fill,
                           );
                         },
